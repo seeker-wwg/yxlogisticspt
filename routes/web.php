@@ -31,9 +31,6 @@ Route::get('/',function ()
     return view('welcome');
 });
 
-
-Route::get('test','WcNotifyController@toWechat');
-
 //【后台路由群组】
 Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 // form提交到控制器路由
@@ -85,10 +82,6 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
     //支付功能--结算
     Route::post('alipay/cart_reserve_jiesuan', 'AlipayController@cart_jiesuan');
     Route::post('alipay/cart_jiesuan', 'AlipayController@cart_jiesuan');
-
-
-
-
     //----微信
 
     //支付完成的post请求
