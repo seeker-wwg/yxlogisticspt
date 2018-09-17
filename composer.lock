@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "65b6da461b09ce8977aa6b688581d99d",
+    "content-hash": "1e37c626a82e2066b4fcf1d49f96b273",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2482,61 +2482,6 @@
             "time": "2016-09-01T10:05:43+00:00"
         },
         {
-            "name": "yansongda/laravel-notification-wechat",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/yansongda/laravel-notification-wechat.git",
-                "reference": "0ce03a261d5179d1c3af351b3caf4530262974b1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/yansongda/laravel-notification-wechat/zipball/0ce03a261d5179d1c3af351b3caf4530262974b1",
-                "reference": "0ce03a261d5179d1c3af351b3caf4530262974b1",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/notifications": "^5.3",
-                "illuminate/support": "^5.1",
-                "php": ">=5.6",
-                "yansongda/supports": "^1.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^6.2"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Yansongda\\LaravelNotificationWechat\\WechatServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Yansongda\\LaravelNotificationWechat\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "yansongda",
-                    "email": "me@yansongda.cn"
-                }
-            ],
-            "description": "Laravel Wechat Notifications Driver",
-            "keywords": [
-                "laravel",
-                "notification",
-                "template",
-                "wechat"
-            ],
-            "time": "2018-05-21T08:59:01+00:00"
-        },
-        {
             "name": "yansongda/laravel-pay",
             "version": "v1.0.3",
             "source": {
@@ -2634,51 +2579,6 @@
                 "wechat"
             ],
             "time": "2018-06-13T03:14:13+00:00"
-        },
-        {
-            "name": "yansongda/supports",
-            "version": "v1.5.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/yansongda/supports.git",
-                "reference": "caad088305db124bc9ef9c46b5f6b19e0d7c5b5a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/yansongda/supports/zipball/caad088305db124bc9ef9c46b5f6b19e0d7c5b5a",
-                "reference": "caad088305db124bc9ef9c46b5f6b19e0d7c5b5a",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "^6.2",
-                "php": ">=5.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Yansongda\\Supports\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "yansongda",
-                    "email": "me@yansongda.cn"
-                }
-            ],
-            "description": "common components",
-            "keywords": [
-                "Guzzle",
-                "array",
-                "collection",
-                "config",
-                "http",
-                "support"
-            ],
-            "time": "2018-07-09T01:25:27+00:00"
         }
     ],
     "packages-dev": [

@@ -34,7 +34,6 @@ Route::get('/',function ()
 //【后台路由群组】
 Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 // form提交到控制器路由
-    Route::get('dd/to','NotifyController@toWechat');
     Route::match(['get', 'post'], 'upload/upload_car_execel','UploadController@upload_car_execel');
     Route::group(['middleware'=>'loginyz'],function() {
         //用户登录系统
@@ -317,17 +316,63 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 ////                        $v = null;
 //            $query->where($k, null);
 //        }
-        $hel = new WcNotify();
+//        $hel = new WcNotify();
+//
+//        $data = [
+//            'first' => ['value'=>urlencode("恭喜你,获奖了"),'color'=>"#743A3A"],
+//            'keyword1' => ['value'=>urlencode("PhoneX -部")],
+//            'keyword2' => ['value'=>urlencode("9999元")],
+//            'keyword3' => ['value'=>urlencode("王玉龙")],
+//            'remark' => ['value'=>urlencode('永久有效!密码为:1231313')]
+//        ];
+//       $dda = $hel->doSend('oWbEz1l8-zPhAsRDY5Jujz8xrkW8','I93GAKQaaodpW_NL6y3JtxQUgS28agb7c2FMvZ8fFGQ','http://56.xizangyaxiangwuliu.com',$data);
+//        $veh_ids = [1,2];
+//        $y_info = OrderVeh::with('veh_type')->whereIn('order_veh_id',$veh_ids)->get(['type_id'])->toArray();
 
-        $data = [
-            'first' => ['value'=>urlencode("恭喜你,获奖了"),'color'=>"#743A3A"],
-            'keyword1' => ['value'=>urlencode("PhoneX -部")],
-            'keyword2' => ['value'=>urlencode("9999元")],
-            'keyword3' => ['value'=>urlencode("王玉龙")],
-            'remark' => ['value'=>urlencode('永久有效!密码为:1231313')]
-        ];
-       $dda = $hel->doSend('oWbEz1l8-zPhAsRDY5Jujz8xrkW8','I93GAKQaaodpW_NL6y3JtxQUgS28agb7c2FMvZ8fFGQ','http://56.xizangyaxiangwuliu.com',$data);
-        return $dda;
+        $car_ids = [1];
+        $veh_ids = [[1,2]];
+//        $ztm =[0,0,0,0];
+//        return $ztm;
+        $y_num = 0;
+        foreach ($car_ids as $k => $v){
+            $status = Car::select('state','yuxia_num')->where('car_id',$v)->limit(1)->get();
+            $yuxia_num = $status[0]->yuxia_num;
+            $yuxia_num_0 = $yuxia_num;
+            if($status[0]->state === '运输中' || $status[0]->state === '停运'){
+                $ztm[$k] = 3;
+                continue;
+            }
+            $y_info = OrderVeh::with('veh_type')->whereIn('order_veh_id',$veh_ids[$k])->get(['type_id'])->toArray();
+            foreach ($y_info as $v_k => $v_v){
+                $y_num += $v_v['veh_type']['cewei_num'];
+            }
+            if($yuxia_num < $y_num){
+                $ztm[$k] = 2;
+                continue;
+            }
+            foreach ($veh_ids[$k] as $kk => $vv){
+                $data_OrderVeh = [
+                    'car_id' => $v,
+                ];
+//                            return ['$v'=>$v,'type_id'=>$vv['type_id'],'type_id1'=>'45'];
+                $z = OrderVeh::where('order_veh_id',$vv)->update($data_OrderVeh);
+                if($z){
+                    $cewei_num = OrderVeh::with('veh_type')->where('order_veh_id',$vv)->get(['type_id']);
+                    $yuxia_num_0 = $yuxia_num_0 - $cewei_num[0]['veh_type']->cewei_num;
+                    xieru($cewei_num[0]['veh_type']->cewei_num.'---'.$yuxia_num_0);
+                    $data_car = [
+                        'yuxia_num' => $yuxia_num_0,
+                    ];
+                    $zz = Car::where('car_id',$v)->update($data_car);
+                    $ztm[$k] = 0;
+                }else{
+                    $ztm[$k] = 1;
+                }
+            }
+        }
+
+
+        return $ztm;
     });
 
 
@@ -350,6 +395,7 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
             Route::post('order/up_pic','OrderController@up_pic');
             //装车
             Route::post('order/load_car','OrderController@load_car');
+            Route::post('order/unload_car','OrderController@unload_car');
 
 
             //用户登录系统

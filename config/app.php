@@ -139,7 +139,7 @@ return [
     */
 
     'providers' => [
-        Yansongda\LaravelNotificationWechat\WechatServiceProvider::class,
+
 //        Laravel\Socialite\SocialiteServiceProvider::class,
         \SocialiteProviders\Manager\ServiceProvider::class,
         //可能是我用过的最优雅的 Alipay 和 WeChat 的 laravel 支付扩展包了

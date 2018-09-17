@@ -402,71 +402,58 @@ class OrderController extends Controller
            $token  = $info[1];
             $huo_num = 0;
             $y_num = 0;
-            $order_id = $data['order_id'];
-            if(isset($data['car_ids']) && !empty($data['car_ids'])){
-                $status = Car::select('state','yuxia_num')->whereIn('car_id',$data['car_ids'])->get();
-                foreach ($status as $k => $v){
-                    if($v->state === '运输中' || $v->state === '停运'){
-                        $shuju = ['errorinfo'=>false];
-                        return re_jiami('500',$shuju,$token);
-                    }else{
-                        $huo_num += $v->yuxia_num;
+            $veh_ids = $data['veh_id'];
+            $car_ids =$data['car_ids'];
+            //状态码
+            $ztm = [];
+            if(count($veh_ids) != count($car_ids)){
+                $shuju = ['errorinfo'=>'数量不匹配'];
+                return re_jiami('500',$shuju,$token);
+            }else{
+                foreach ($car_ids as $k => $v){
+                    $status = Car::select('state','yuxia_num')->where('car_id',$v)->limit(1)->get();
+                   //获取这个货车被装之前的余量
+                    $yuxia_num = $status[0]->yuxia_num;
+                    //更新car 车位余量变量
+                    $yuxia_num_0 = $yuxia_num;
+                    if($status[0]->state === '运输中' || $status[0]->state === '停运'){
+                        $ztm[$k] = 3;
+                        continue;
                     }
-                }
-                $y_info = OrderVeh::with('veh_type')->where('order_id',$order_id)->get(['type_id'])->toArray();
-                //三维数组从小到大排序
-                $y_info = mul_sort($y_info,'veh_type','cewei_num');
-                foreach ($y_info as $k => $v){
-                    $y_num += $v['veh_type']['cewei_num'];
-                }
-
-                if($huo_num < $y_num) {
-                    $shuju = ['errorinfo' => '货车单位不足成功','huo_num'=>$huo_num,'y_num'=>$y_num];
-                    return re_jiami(500, $shuju,$token);
-                }else{
-                    //增加关联表的数据
-                    foreach ($data['car_ids'] as $k =>$v){
-                        $yuxia_num = Car::select('yuxia_num')->where('car_id',$v)->get();
-                        $h_yuxia = $yuxia_num[0]->yuxia_num;
-                        $yuxia_num = $h_yuxia;
-                        foreach ($y_info as $kk => $vv){
-                            $y_cewei = $vv['veh_type']['cewei_num'];
-//                        return ['$h_yuxia'=>$h_yuxia,'$y_cewei'=>$y_cewei];
-                            //判断被运输是否小于单个货车车位
-                            if($h_yuxia > $y_cewei){
-                                //除去已分配好的车辆
-                                $h_yuxia = $yuxia_num -$y_cewei;
-                                $data_OrderVeh = [
-                                    'car_id' => $v,
-                                ];
+                    $y_info = OrderVeh::with('veh_type')->whereIn('order_veh_id',$veh_ids[$k])->get(['type_id'])->toArray();
+                    foreach ($y_info as $v_k => $v_v){
+                        $y_num += $v_v['veh_type']['cewei_num'];
+                    }
+                    if($yuxia_num < $y_num){
+                        $ztm[$k] = 2;
+                        continue;
+                    }
+                    //循环装车
+                    foreach ($veh_ids[$k] as $kk => $vv){
+                        $data_OrderVeh = [
+                            'car_id' => $v,
+                        ];
 //                            return ['$v'=>$v,'type_id'=>$vv['type_id'],'type_id1'=>'45'];
-                                OrderVeh::where('type_id',$vv['type_id'])->update($data_OrderVeh);
-                                unset($y_info[$kk]);
-                            }else{
-                                //如果$y_info 未分配完 但是此货车 一装不下 更新 车位
-                                $data_car = [
-                                    'yuxia_num' => $h_yuxia,
-                                ];
-                                Car::where('car_id',$v)->update($data_car);
-                                //给下一辆货车分配
-                                break;
-                            }
-                            //如果$y_info 为空已分配完 更新 车位
-                            if(empty($y_info)){
-                                $data_car = [
-                                    'yuxia_num' => $h_yuxia,
-                                ];
-                                Car::where('car_id',$v)->update($data_car);
-                                //给下一辆货车分配
-                                $shuju = ['errorinfo' => '货车分配成功'];
-                                return re_jiami(200, $shuju,$token);
-                            }
+                        $z = OrderVeh::where('order_veh_id',$vv)->update($data_OrderVeh);
+                        if($z){
+                            $cewei_num = OrderVeh::with('veh_type')->where('order_veh_id',$vv)->get(['type_id']);
+                            $yuxia_num_0 = $yuxia_num_0 - $cewei_num[0]['veh_type']->cewei_num;
+                            xieru($cewei_num[0]['veh_type']->cewei_num.'---'.$yuxia_num_0);
+                            $data_car = [
+                                'yuxia_num' => $yuxia_num_0,
+                            ];
+                            $zz = Car::where('car_id',$v)->update($data_car);
+                            $ztm[$k] = 0;
+                        }else{
+                            $ztm[$k] = 1;
                         }
                     }
                 }
+
+                $shuju = ['errorinfo'=>$ztm];
+                return re_jiami(200,$shuju,$token);
             }
         }
-
     }
 
     /**
