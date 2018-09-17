@@ -15,3 +15,126 @@ unde
 2018-09-15 16:52:37 : {"dre":"unde","id":1}
 2018-09-16 19:25:10 : 3---3
 2018-09-16 19:25:10 : 2---1
+2018-09-17 14:27:35 : 
+2018-09-17 14:30:43 : [["logo_url"],[],[],"field",null,null,"field_id","desc",[],[],null,null,{"duan":"field_id","sjk":"field","field":["logo_url"]}]
+2018-09-17 14:30:43 : 
+2018-09-17 14:30:44 : [null,[],[],null,null,null,null,"desc",[],[],null,null,null]
+
+2018-09-17 14:34:54 : {"duan":"field_id","sjk":"field","field":["logo_url"]}
+2018-09-17 14:34:54 : [["logo_url"],[],[],"field",null,null,"field_id","desc",[],[],null,null,{"duan":"field_id","sjk":"field","field":["logo_url"]}]
+2018-09-17 14:34:54 : 
+
+2018-09-17 14:34:54 : 
+2018-09-17 14:34:54 : [null,[],[],null,null,null,null,"desc",[],[],null,null,null]
+2018-09-17 14:45:48 : {"duan":"field_id","sjk":"field","field":["logo_url"]}
+2018-09-17 14:45:48 : [["logo_url"],[],[],"field",null,null,"field_id","desc",[],[],null,null,{"duan":"field_id","sjk":"field","field":["logo_url"]}]
+2018-09-17 14:45:48 : 
+2018-09-17 14:50:10 : {"duan":"field_id","sjk":"field","field":["logo_url"]}
+2018-09-17 14:50:10 : [["logo_url"],[],[],"field",null,null,"field_id","desc",[],[],null,null,{"duan":"field_id","sjk":"field","field":["logo_url"]}]
+2018-09-17 14:50:10 : 
+2018-09-17 15:28:19 : {"duan":"field_id","sjk":"field","field":["logo_url"]}
+2018-09-17 15:28:19 : [["logo_url"],[],[],"field",null,null,"field_id","desc",[],[],null,null,{"duan":"field_id","sjk":"field","field":["logo_url"]}]
+2018-09-17 15:28:19 : 
+2018-09-17 15:28:34 : 
+2018-09-17 15:28:34 : [null,[],[],null,null,null,null,"desc",[],[],null,null,null]
+2018-09-17 15:29:12 : {"duan":"field_id","sjk":"field","field":["logo_url"]}
+2018-09-17 15:29:12 : [["logo_url"],[],[],"field",null,null,"field_id","desc",[],[],null,null,{"duan":"field_id","sjk":"field","field":["logo_url"]}]
+2018-09-17 15:29:12 : 
+2018-09-17 15:29:13 : 
+2018-09-17 15:29:13 : [null,[],[],null,null,null,null,"desc",[],[],null,null,null]
+2018-09-17 15:30:06 : {"duan":"field_id","sjk":"field","field":["logo_url"]}
+2018-09-17 15:30:06 : [["logo_url"],[],[],"field",null,null,"field_id","desc",[],[],null,null,{"duan":"field_id","sjk":"field","field":["logo_url"]}]
+2018-09-17 15:30:06 : 
+2018-09-17 15:30:06 : 
+2018-09-17 15:30:06 : [null,[],[],null,null,null,null,"desc",[],[],null,null,null]
+2018-09-17 15:30:44 : {"duan":"field_id","sjk":"field","field":["logo_url"]}
+2018-09-17 15:30:44 : [["logo_url"],[],[],"field",null,null,"field_id","desc",[],[],null,null,{"duan":"field_id","sjk":"field","field":["logo_url"]}]
+2018-09-17 15:30:44 : 
+2018-09-17 15:30:44 : 
+2018-09-17 15:30:44 : [null,[],[],null,null,null,null,"desc",[],[],null,null,null]
+2018-09-17 15:34:01 : {"duan":"field_id","sjk":"field","field":["logo_url"]}
+2018-09-17 15:34:01 : [["logo_url"],[],[],"field",null,null,"field_id","desc",[],[],null,null,{"duan":"field_id","sjk":"field","field":["logo_url"]}]
+2018-09-17 15:34:01 : 
+2018-09-17 15:34:02 : {"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}
+2018-09-17 15:34:02 : [["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"],[],[],"region",null,null,"region_id","desc",[],[],null,null,{"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}]
+2018-09-17 15:34:02 : 
+2018-09-17 15:34:35 : {"duan":"field_id","sjk":"field","field":["logo_url"]}
+2018-09-17 15:34:35 : [["logo_url"],[],[],"field",null,null,"field_id","desc",[],[],null,null,{"duan":"field_id","sjk":"field","field":["logo_url"]}]
+2018-09-17 15:34:35 : 
+2018-09-17 15:34:35 : {"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}
+2018-09-17 15:34:35 : [["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"],[],[],"region",null,null,"region_id","desc",[],[],null,null,{"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}]
+2018-09-17 15:34:35 : 
+2018-09-17 15:34:38 : {"start":"0","length":"1","duan":"region_id","sjk":"region","jiansuo":{"region_id":"7"},"field":["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"]}
+2018-09-17 15:34:38 : [["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"],[],[],"region","0","1","region_id","desc",[],{"region_id":"7"},null,null,{"start":"0","length":"1","duan":"region_id","sjk":"region","jiansuo":{"region_id":"7"},"field":["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"]}]
+2018-09-17 15:34:38 : 1
+2018-09-17 15:34:45 : {"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}
+2018-09-17 15:34:45 : [["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"],[],[],"region",null,null,"region_id","desc",[],[],null,null,{"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}]
+2018-09-17 15:34:45 : 
+2018-09-17 15:34:47 : {"start":"0","length":"1","duan":"region_id","sjk":"region","jiansuo":{"region_id":"6"},"field":["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"]}
+2018-09-17 15:34:47 : [["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"],[],[],"region","0","1","region_id","desc",[],{"region_id":"6"},null,null,{"start":"0","length":"1","duan":"region_id","sjk":"region","jiansuo":{"region_id":"6"},"field":["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"]}]
+2018-09-17 15:34:47 : 1
+2018-09-17 15:34:49 : {"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}
+2018-09-17 15:34:49 : [["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"],[],[],"region",null,null,"region_id","desc",[],[],null,null,{"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}]
+2018-09-17 15:34:49 : 
+2018-09-17 15:34:50 : {"start":"0","length":"1","duan":"region_id","sjk":"region","jiansuo":{"region_id":"3"},"field":["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"]}
+2018-09-17 15:34:50 : [["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"],[],[],"region","0","1","region_id","desc",[],{"region_id":"3"},null,null,{"start":"0","length":"1","duan":"region_id","sjk":"region","jiansuo":{"region_id":"3"},"field":["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"]}]
+2018-09-17 15:34:50 : 1
+2018-09-17 15:34:59 : {"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}
+2018-09-17 15:34:59 : [["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"],[],[],"region",null,null,"region_id","desc",[],[],null,null,{"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}]
+2018-09-17 15:34:59 : 
+2018-09-17 15:35:04 : {"start":"0","length":"1","duan":"region_id","sjk":"region","jiansuo":{"region_id":"2"},"field":["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"]}
+2018-09-17 15:35:04 : [["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"],[],[],"region","0","1","region_id","desc",[],{"region_id":"2"},null,null,{"start":"0","length":"1","duan":"region_id","sjk":"region","jiansuo":{"region_id":"2"},"field":["region_id","region_name","region_type","carry_out_cost","longitude","latitude","region_add","province","city","area","created_at","updated_at","give_spot","take_spot"]}]
+2018-09-17 15:35:04 : 1
+2018-09-17 15:35:07 : {"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}
+2018-09-17 15:35:07 : [["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"],[],[],"region",null,null,"region_id","desc",[],[],null,null,{"duan":"region_id","sjk":"region","field":["region_id","region_name","give_spot","take_spot","province","city","area","region_type","longitude","latitude"]}]
+2018-09-17 15:35:07 : 
+2018-09-17 15:35:08 : 1
+2018-09-17 15:35:10 : 
+2018-09-17 15:35:11 : 1
+2018-09-17 15:35:13 : 
+2018-09-17 15:47:49 : 
+2018-09-17 15:47:50 : 
+2018-09-17 15:47:56 : 1
+2018-09-17 15:48:12 : 
+2018-09-17 15:48:14 : 1
+2018-09-17 15:48:16 : 
+2018-09-17 15:48:23 : 1
+2018-09-17 15:48:27 : 
+2018-09-17 15:49:03 : 
+2018-09-17 15:49:03 : 
+2018-09-17 15:49:07 : 1
+2018-09-17 15:49:11 : 
+2018-09-17 15:50:03 : 
+2018-09-17 15:53:21 : 
+2018-09-17 15:56:06 : 
+2018-09-17 15:56:47 : 
+2018-09-17 15:56:50 : 1
+2018-09-17 15:57:03 : 
+2018-09-17 15:57:34 : 1
+2018-09-17 16:05:18 : 
+2018-09-17 16:05:19 : 1
+2018-09-17 16:06:25 : 
+2018-09-17 16:06:27 : 1
+2018-09-17 16:06:46 : 1
+2018-09-17 16:06:47 : 1
+2018-09-17 16:06:49 : 1
+2018-09-17 16:06:49 : 
+2018-09-17 16:06:53 : 1
+2018-09-17 16:06:58 : 
+2018-09-17 16:12:24 : 
+2018-09-17 16:14:24 : 
+2018-09-17 16:17:24 : 
+2018-09-17 16:19:53 : 
+2018-09-17 17:59:32 : 
+2018-09-17 17:59:41 : 
+2018-09-17 18:01:23 : 
+2018-09-17 18:05:32 : 
+2018-09-17 18:08:14 : 
+2018-09-17 18:08:58 : 
+2018-09-17 18:51:42 : 
+2018-09-17 18:53:09 : 
+2018-09-17 18:55:38 : 
+2018-09-17 21:25:53 : 
+2018-09-17 21:26:05 : 
+2018-09-17 21:57:02 : 2---2
+2018-09-17 22:01:37 : 3---1

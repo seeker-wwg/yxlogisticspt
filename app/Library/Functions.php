@@ -21,6 +21,7 @@ use App\Http\Models\Banner;
 use App\Http\Models\WBanner;
 use App\Http\Models\Fit;
 use App\Http\Models\Role;
+use App\Http\Models\CarWai;
 use App\Http\Models\Region;
 use App\Http\Models\Permission;
 use App\Http\Models\OperationLog;
@@ -126,6 +127,12 @@ function orm_sjk($sjk_name){
             break;
         case 'freight':
             $info = Freight::where(function ($query){
+                if(empty(1)){$query->where('order_sn', 'like', "%5acf0%");}
+            });
+            return $info;
+            break;
+        case 'car_wai':
+            $info = CarWai::where(function ($query){
                 if(empty(1)){$query->where('order_sn', 'like', "%5acf0%");}
             });
             return $info;
@@ -256,6 +263,7 @@ function qingqiu_jiami(Request $request){
 //请求解密 返回代号-------------------------------------------------------
 function qingqiu_weijiami(Request $request){
     $info = $request->input('data');
+//    xieru($info);
     //获取自定义字段
     $field = isset($info['field'])?$info['field']:null;
     $connect = isset($info['connect'])?$info['connect']:[];
@@ -302,6 +310,7 @@ function qingqiu_weijiami(Request $request){
 function shousuo(Request $request){
 
     $datainfo= qingqiu_weijiami($request);
+//    xieru($datainfo);
     $shujk = orm_sjk($datainfo[3]);
     if( !is_object ($shujk)){
            return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
@@ -311,7 +320,7 @@ function shousuo(Request $request){
     $created_at = $datainfo[10];
     $updated_at = $datainfo[11];
 
-
+//    xieru($datainfo[5]);
     if(!is_null($datainfo[4]) && !empty($datainfo[5])){
         $shuju = $shujk->offset($datainfo[4])
             ->limit($datainfo[5])
@@ -482,20 +491,6 @@ function jiami_shousuo(Request $request){
             ->with($datainfo[1])
             ->where(function($query) use($request,$jiansuo){
                 foreach ($jiansuo as $k => $v){
-//                 if(!empty($v)){
-//                        //新修改1 加上数组检索
-//                        if(is_array($v)){
-//                            $query->whereIn($k,$v);
-//                        }else{
-//                            if($v == 'unde'){
-//                                $query->where($k, null);
-//                            }else if($v == 'de'){
-//                                $query->where($k, '!=',null);
-//                            }else{
-//                                $query->where($k, $v);
-//                            }
-//                        }
-//                    }
                     if (!empty($v)  && ($v != 'unde') && ($v != 'de')){
                         //新修改1 加上数组检索
                         if(is_array($v)){

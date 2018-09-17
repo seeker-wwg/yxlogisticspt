@@ -10,11 +10,10 @@ class Car extends Model
     protected $table = "car"; //表名
     protected $primaryKey = "car_id"; //主键名字
     protected $fillable = [
-       'longtitude','latitude',
         'car_name', 'car_img', 'plate_num',
         'engine_num', 'frame_num', 'car_type',
         'driver_id', 'license_img','state',
-        'unit_total_num','yuxia_num','cewei_state',
+        'unit_total_num','yuxia_num',
         'created_at', 'updated_at', 'deleted_at'
     ];//数据添加、修改时允许维护的字段
     public function driver()
