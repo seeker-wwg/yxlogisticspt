@@ -21,8 +21,8 @@ class Car extends Model
         return $this->hasOne('\App\Http\Models\Driver', 'driver_id', 'driver_id');
     }
 
-    public function order()
+    public function order_veh()
     {
-        return $this->hasOne('\App\Http\Models\Order', 'order_id', 'order_id');
+        return $this->hasMany('\App\Http\Models\OrderVeh', 'car_id');
     }
 }

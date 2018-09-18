@@ -10,6 +10,7 @@ class CarWai extends Model
     protected $table = "car_wai"; //表名
     protected $primaryKey = "wai_id"; //主键名字
     protected $fillable = [
+        'is_current',
         'car_id', 'longitude',
         'latitude', 'mg_id',
         'longitude', 'address_name',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 header("Access-Control-Allow-Origin:*"); //*号表示所有域名都可以访问
 header("Access-Control-Allow-Method:POST,GET");
 use App\Http\Models\Car;
+use App\Http\Models\CarTypeNum;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -28,11 +29,66 @@ class CarController extends Controller
      * @param Request $request
      * @param Car $User
      * @return array|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * '半拖车','全拖车','微型货车','轻型货车','中型货车','重型货车'
      */
     public function update(Request $request)
     {
         if ($request->isMethod('post')) {
-         return xiugai($request);
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            $formData = $info['formData'];
+            $query = $info['query'];
+            foreach ($query as $k =>$v){
+                $key  = $k;
+                $value = $v;
+            }
+            if(array_key_exists('car_type', $formData)){
+
+                $car_type =  $formData['car_type'];
+               $gai_car_type = CarTypeNum::where('car_type',$car_type)->limit(1)->get();
+                $gai_id = $gai_car_type[0]->id;
+                $gai_unit_total_num = $gai_car_type[0]->unit_total_num;
+                $cur_car = Car::where($key,$value)->limit(1)->get();
+                $cur_car = $cur_car[0];
+                    $cur_car_type = $cur_car->car_type;
+                    $cur_car_type = CarTypeNum::where('car_type',$cur_car_type)->limit(1)->get();
+                    $cur_id = $cur_car_type[0]->id;
+                    $cur_unit_total_num = $cur_car_type[0]->unit_total_num;
+                $cur_yi_num =$cur_unit_total_num - $cur_car->yuxia_num;
+                    if($cur_id >$gai_id){
+                        //已装多少车位
+                        if($gai_unit_total_num < $cur_yi_num){
+                            $shuju = ['errorinfo'=>'要改变的货车类型车位不够'];
+                            return re_jiami(500,$shuju,$token);
+                        }else{
+                            $gai_num = [
+                                'unit_total_num'=>$gai_unit_total_num,
+                                'yuxia_num'=>$gai_unit_total_num - $cur_yi_num,
+                            ];
+                            $z = Car::where($key,$value)->update($gai_num);
+                        }
+                    }else{
+                        $gai_num = [
+                            'unit_total_num'=>$gai_unit_total_num,
+                            'yuxia_num'=>$gai_unit_total_num - $cur_yi_num,
+                        ];
+                        $z = Car::where($key,$value)->update($gai_num);
+                    }
+                }
+            $sjk = $info['sjk'];
+            $ziyuan = orm_sjk($sjk);
+            if( !is_object ($ziyuan)){
+                return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
+            }
+            $z = $ziyuan->where($key,$value)->update($formData);
+            if ($z) {
+                $shuju = ['errorinfo'=>'修改成功'];
+                return re_jiami(200,$shuju,$token);
+            } else {
+                $shuju = ['errorinfo'=>'修改失败'];
+                return re_jiami(500,$shuju,$token);
+            }
         }
     }
 
@@ -45,7 +101,28 @@ class CarController extends Controller
     public function create(Request $request)
     {
         if ($request->isMethod('post')) {
-            return zengjia($request);
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            $sjk = $info['sjk'];
+            $ziyuan = orm_sjk($sjk);
+            $formData = $info['formData'];
+            $cur_car_type = CarTypeNum::where('car_type',$formData['car_type'])->limit(1)->get();
+            $unit_total_num = $cur_car_type[0]->unit_total_num;
+            $yuxia_num = $unit_total_num;
+            $formData['unit_total_num'] =$unit_total_num;
+            $formData['yuxia_num'] =$yuxia_num;
+            if( !is_object ($ziyuan)){
+                return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
+            }
+            $z = $ziyuan->create($formData);
+            if ($z) {
+                $shuju = ['errorinfo'=>'增加成功'];
+                return re_jiami(200,$shuju,$token);
+            } else {
+                $shuju = ['errorinfo'=>'增加失败'];
+                return re_jiami(500,$shuju,$token);
+            }
         }
     }
 

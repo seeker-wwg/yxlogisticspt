@@ -263,7 +263,6 @@ function qingqiu_jiami(Request $request){
 //请求解密 返回代号-------------------------------------------------------
 function qingqiu_weijiami(Request $request){
     $info = $request->input('data');
-//    xieru($info);
     //获取自定义字段
     $field = isset($info['field'])?$info['field']:null;
     $connect = isset($info['connect'])?$info['connect']:[];
@@ -329,7 +328,7 @@ function shousuo(Request $request){
             //$jiansuo -->9          '检索数据数组'jiansuo:{'start':1,'type_id':{1,2,3}}
             ->where(function($query) use($request,$jiansuo){
                 foreach ($jiansuo as $k => $v){
-                    if (!empty($v)  && ($v != 'unde') && ($v != 'de')){
+                    if ($v == '0' || (!empty($v)   && ($v != 'unde') && ($v != 'de'))){
                         //新修改1 加上数组检索
                         if(is_array($v)){
                             $query->whereIn($k,$v);
@@ -380,7 +379,7 @@ function shousuo(Request $request){
             ->with($datainfo[1])
             ->where(function($query) use($request,$jiansuo){
                 foreach ($jiansuo as $k => $v){
-                    if (!empty($v)  && ($v != 'unde') && ($v != 'de')){
+                    if ($v == '0' || (!empty($v)   && ($v != 'unde') && ($v != 'de'))){
                         //新修改1 加上数组检索
                         if(is_array($v)){
                             $query->whereIn($k,$v);
@@ -439,6 +438,7 @@ function jiami_shousuo(Request $request){
     }
     $search = $datainfo[8];
     $jiansuo = $datainfo[9];
+    xieru($jiansuo);
     $created_at = $datainfo[10];
     $updated_at = $datainfo[11];
 //return [$datainfo[4],$datainfo[5]];
@@ -449,12 +449,11 @@ function jiami_shousuo(Request $request){
             ->with($datainfo[1])
             ->where(function($query) use($request,$jiansuo){
                 foreach ($jiansuo as $k => $v){
-                    if (!empty($v)  && ($v != 'unde') && ($v != 'de')){
+                    if ($v == '0' || (!empty($v)   && ($v != 'unde') && ($v != 'de'))){
                         //新修改1 加上数组检索
                         if(is_array($v)){
                             $query->whereIn($k,$v);
                         }else{
-//                            $v = '等待中1';
                             $query->where($k, $v);
                         }
                     }else if($v == 'unde'){
@@ -491,7 +490,7 @@ function jiami_shousuo(Request $request){
             ->with($datainfo[1])
             ->where(function($query) use($request,$jiansuo){
                 foreach ($jiansuo as $k => $v){
-                    if (!empty($v)  && ($v != 'unde') && ($v != 'de')){
+                    if ($v == '0' || (!empty($v)   && ($v != 'unde') && ($v != 'de'))){
                         //新修改1 加上数组检索
                         if(is_array($v)){
                             $query->whereIn($k,$v);

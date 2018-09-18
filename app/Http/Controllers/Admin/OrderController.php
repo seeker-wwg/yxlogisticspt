@@ -432,13 +432,13 @@ class OrderController extends Controller
                     foreach ($veh_ids[$k] as $kk => $vv){
                         $data_OrderVeh = [
                             'car_id' => $v,
+                            'is_load' => '1',
                         ];
 //                            return ['$v'=>$v,'type_id'=>$vv['type_id'],'type_id1'=>'45'];
                         $z = OrderVeh::where('order_veh_id',$vv)->update($data_OrderVeh);
                         if($z){
                             $cewei_num = OrderVeh::with('veh_type')->where('order_veh_id',$vv)->get(['type_id']);
                             $yuxia_num_0 = $yuxia_num_0 - $cewei_num[0]['veh_type']->cewei_num;
-//                            xieru($cewei_num[0]['veh_type']->cewei_num.'---'.$yuxia_num_0);
                             $data_car = [
                                 'yuxia_num' => $yuxia_num_0,
                             ];
@@ -468,18 +468,34 @@ class OrderController extends Controller
             $info = re_jiemi($request);
             $data = $info[0];
             $token  = $info[1];
-            $car_ids = $data['car_ids'];
+            $car_id = $data['car_id'];
             $order_id = $data['order_id'];
-            foreach ($car_ids as $k => $v){
-                $data_state = ['state'=>'运输中'];
-                Car::where('car_id',$v)->update($data_state);
+            //所有更改状态的订单id
+            $order_ids = [];
+            if(empty($car_ids)){
+                $shuju = ['errorinfo'=>'未选中'];
+                return re_jiami(500,$shuju,$token);
             }
-            $order_state = ['process'=>'运输中'];
-            $z = Order::where('order_id',$order_id)->update($order_state);
+                $data_state = ['state'=>'运输中'];
+            $z = Car::where('car_id',$car_id)->update($data_state);
             if ($z) {
-                $shuju = ['errorinfo'=>'发车成功'];
-                return re_jiami(200,$shuju,$token);
-            } else {
+                $order_veh =  Car::with('order_veh')->where('car_id',$car_id)->get(['car_id']);
+                foreach ($gai_id[0]->order_veh as $k => $v){
+                    if(in_array($v->order_id,$order_ids)){
+                        continue;
+                    }else{
+                        $order_state = ['process'=>'运输中'];
+                        $zz = Order::where('order_id',$order_id)->update($order_state);
+                    }
+                }
+                if ($zz) {
+                    $shuju = ['errorinfo'=>'已成功发车'];
+                    return re_jiami(200,$shuju,$token);
+                } else {
+                    $shuju = ['errorinfo'=>'订单状态更新失败'];
+                    return re_jiami(500,$shuju,$token);
+                }
+            }else{
                 $shuju = ['errorinfo'=>'发车失败'];
                 return re_jiami(500,$shuju,$token);
             }
@@ -519,11 +535,11 @@ class OrderController extends Controller
                     }
                     //循环装车
                     foreach ($veh_ids[$k] as $kk => $vv){
-//                        $data_OrderVeh = [
-//                            'car_id' => $v,
-//                        ];
-////                            return ['$v'=>$v,'type_id'=>$vv['type_id'],'type_id1'=>'45'];
-//                        $z = OrderVeh::where('order_veh_id',$vv)->update($data_OrderVeh);
+                        $data_OrderVeh = [
+                            'is_load' => '0',
+                        ];
+//                            return ['$v'=>$v,'type_id'=>$vv['type_id'],'type_id1'=>'45'];
+                        $z = OrderVeh::where('order_veh_id',$vv)->update($data_OrderVeh);
 
                             $cewei_num = OrderVeh::with('veh_type')->where('order_veh_id',$vv)->get(['type_id']);
                             $yuxia_num_0 = $yuxia_num_0 + $cewei_num[0]['veh_type']->cewei_num;

@@ -7,6 +7,7 @@ use App\Http\Models\Car;
 use App\Http\Models\Manager;
 use App\Http\Models\Driver;
 use App\Http\Models\Permission;
+use App\Http\Models\CarTypeNum;
 use App\Http\Models\Region;
 use Illuminate\Support\Facades\DB;
 use zgldh\QiniuStorage\QiniuStorage;
@@ -64,6 +65,7 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
     Route::post( 'region/index','RegionController@index');
 
     Route::post('banner/index','BannerController@index');
+    Route::post('wbanner/index','WBannerController@index');
     Route::post( 'field/index','FieldController@index');
 
     Route::post( 'freight/index','FreightController@index');
@@ -316,65 +318,23 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 ////                        $v = null;
 //            $query->where($k, null);
 //        }
-        $hel = new WcNotify();
-//
-        $data = [
-            'first' => ['value'=>urlencode("订单通知"),'color'=>"#743A3A"],
-            'keyword1' => ['value'=>urlencode("你在后台有订单要处理")],
-//            'keyword2' => ['value'=>urlencode("9999元")],
-//            'keyword3' => ['value'=>urlencode("王玉龙")],
-            'remark' => ['value'=>urlencode(date('Y-m-d H:i:s',time()))]
-        ];
-       $dda = $hel->doSend('oWbEz1iSdXG_H78ZrGvRBvd9AfBE',
-           'iOCJhOwTL64EHbsm71oCFNtES7PfzpEAuJG1Atf3vmA','http://56.xizangyaxiangwuliu.com',$data);
-       return [$dda];
-//        $veh_ids = [1,2];
-//        $y_info = OrderVeh::with('veh_type')->whereIn('order_veh_id',$veh_ids)->get(['type_id'])->toArray();
-
-//        $car_ids = [1];
-//        $veh_ids = [[1,2]];
-//        $ztm =[0,0,0,0];
-//        return $ztm;
-//        $y_num = 0;
-//        foreach ($car_ids as $k => $v){
-//            $status = Car::select('state','yuxia_num')->where('car_id',$v)->limit(1)->get();
-//            $yuxia_num = $status[0]->yuxia_num;
-//            $yuxia_num_0 = $yuxia_num;
-//            if($status[0]->state === '运输中' || $status[0]->state === '停运'){
-//                $ztm[$k] = 3;
-//                continue;
-//            }
-//            $y_info = OrderVeh::with('veh_type')->whereIn('order_veh_id',$veh_ids[$k])->get(['type_id'])->toArray();
-//            foreach ($y_info as $v_k => $v_v){
-//                $y_num += $v_v['veh_type']['cewei_num'];
-//            }
-//            if($yuxia_num < $y_num){
-//                $ztm[$k] = 2;
-//                continue;
-//            }
-//            foreach ($veh_ids[$k] as $kk => $vv){
-//                $data_OrderVeh = [
-//                    'car_id' => $v,
-//                ];
-////                            return ['$v'=>$v,'type_id'=>$vv['type_id'],'type_id1'=>'45'];
-//                $z = OrderVeh::where('order_veh_id',$vv)->update($data_OrderVeh);
-//                if($z){
-//                    $cewei_num = OrderVeh::with('veh_type')->where('order_veh_id',$vv)->get(['type_id']);
-//                    $yuxia_num_0 = $yuxia_num_0 - $cewei_num[0]['veh_type']->cewei_num;
-//                    xieru($cewei_num[0]['veh_type']->cewei_num.'---'.$yuxia_num_0);
-//                    $data_car = [
-//                        'yuxia_num' => $yuxia_num_0,
-//                    ];
-//                    $zz = Car::where('car_id',$v)->update($data_car);
-//                    $ztm[$k] = 0;
-//                }else{
-//                    $ztm[$k] = 1;
-//                }
-//            }
-//        }
-
-
-
+//        $hel = new WcNotify();
+////
+//        $data = [
+//            'first' => ['value'=>urlencode("订单通知"),'color'=>"#743A3A"],
+//            'keyword1' => ['value'=>urlencode("你在后台有订单要处理")],
+////            'keyword2' => ['value'=>urlencode("9999元")],
+////            'keyword3' => ['value'=>urlencode("王玉龙")],
+//            'remark' => ['value'=>urlencode(date('Y-m-d H:i:s',time()))]
+//        ];
+//       $dda = $hel->doSend('oWbEz1iSdXG_H78ZrGvRBvd9AfBE',
+//           'iOCJhOwTL64EHbsm71oCFNtES7PfzpEAuJG1Atf3vmA','http://56.xizangyaxiangwuliu.com',$data);
+//        $gai_id =  OrderVeh::whereIn('order_id',[7])->where('is_load','1')->get();
+        $a = [];
+        if(empty($a)){
+            return 0;
+        }
+//        return $gai_id;
     });
 
 

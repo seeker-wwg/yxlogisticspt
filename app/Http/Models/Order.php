@@ -35,7 +35,7 @@ class Order extends Model
     }
     public function order_veh()
     {
-        return $this->hasOne('\App\Http\Models\OrderVeh', 'order_id', 'order_id');
+        return $this->hasMany('\App\Http\Models\OrderVeh', 'order_id');
     }
     public function order_wai()
     {
