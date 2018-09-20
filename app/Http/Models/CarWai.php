@@ -11,9 +11,9 @@ class CarWai extends Model
     protected $primaryKey = "wai_id"; //主键名字
     protected $fillable = [
         'is_current',
+        'order_ids',
         'car_id', 'longitude',
-        'latitude', 'mg_id',
-        'longitude', 'address_name',
+        'latitude', 'address_name',
         'created_at', 'updated_at', 'deleted_at'
     ];//数据添加、修改时允许维护的字段
     public function car()

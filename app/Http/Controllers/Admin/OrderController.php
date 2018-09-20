@@ -15,6 +15,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
 use App\Http\Models\User;
 use App\Http\Models\Car;
+use App\Http\Models\CarWai;
 use App\Http\Models\Region;
 use App\Tools\Cart;
 class OrderController extends Controller
@@ -192,189 +193,60 @@ class OrderController extends Controller
             $order_sn = uniqid('');
             //计算总价
             //1.车的费用
-            $car_cost = Freight::whereIn('freight_id',$freight_id)->get(['freight_cost','type_id'])->toArray();
-            $car_costs = 0;
-            foreach ($car_data as $k => $v){
-                foreach ($car_cost as $kk => $vv) {
-                    if ($v['type_id'] == $vv['type_id']) {
-                        $car_costs += $vv['freight_cost'];
-                    }
-                }
-            }
+//            $car_cost = Freight::whereIn('freight_id',$freight_id)->get(['freight_cost')->toArray();
+//            $car_costs = 0;
+//                foreach ($car_cost as $kk => $vv) {
+//                        $car_costs += $vv['freight_cost'];
+//                }
 
-            //送车上门的费用
-            if($formData['sender_type'] == '平台派人上门取车'){
-                $sender_cost = Region::select('carry_out_cost')->find($info['sender_id']);
-                $sender_cost = $sender_cost->carry_out_cost;
-            }
-            if($formData['receive_type'] == '平台派人送车上门'){
-                $receive_cost = Region::select('carry_out_cost')->find($info['receive_id']);
-                $receive_cost = $receive_cost->carry_out_cost;
-            }
-            //总额
-            $total_price = $car_costs + $sender_cost + $receive_cost + $formData['baoe_cost'] + $formData['baofei_cost'];
-
-            if($formData['total_price'] !== $total_price){
-                $formData['total_price'] = $total_price;
-            }
+//
+//            //送车上门的费用
+//            if($formData['sender_type'] == '平台派人上门取车'){
+//                $sender_cost = Region::select('carry_out_cost')->find($info['sender_id']);
+//                $sender_cost = $sender_cost->carry_out_cost;
+//            }
+//            if($formData['receive_type'] == '平台派人送车上门'){
+//                $receive_cost = Region::select('carry_out_cost')->find($info['receive_id']);
+//                $receive_cost = $receive_cost->carry_out_cost;
+//            }
+//            //总额
+//            $total_price = $car_costs + $sender_cost + $receive_cost + $formData['baoe_cost'] + $formData['baofei_cost'];
+//
+//            if($formData['total_price'] !== $total_price){
+//                $formData['total_price'] = $total_price;
+//            }
 
             //2.上门取车
+            $ziyuan = orm_sjk($sjk);
+            if( !is_object ($ziyuan)){
+                return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
+            }
+            $z = $ziyuan->create($formData);
 
             $formData['order_sn'] = $order_sn;
             if(!empty($car_data)){
-                //实例化购物车类对象
-                $cart = new Cart();
-                //添加课程到购物车
-                $cart -> add($car_data);
+                foreach ($car_data as $v) {
+                    $v['order_id'] =$z;
+                    OrderVeh::create($v);
+                }
             }
-           luoji_zengjia($sjk,$formData,$token);
+            if ($z) {
+                $shuju = ['errorinfo'=>'增加成功'];
+                return re_jiami(200,$shuju,$token);
+            } else {
+                $shuju = ['errorinfo'=>'增加失败'];
+                return re_jiami(500,$shuju,$token);
+            }
         }
     }
 
     public function update(Request $request)
     {
         if ($request->isMethod('post')) {
-            $datainfo =re_jiemi($request);
-            $info = $datainfo[0];
-            $token = $datainfo[1];
-            $query = $info['query'];
-            foreach ($query as $k =>$v){
-                $key  = $k;
-                $value = $v;
+                return xiugai($request);
             }
-            //在这里判断
-            $formData = $info['formData'];
-//            if(array_key_exists('car_id', $formData)){
-////                $order_id = $ziyuan->select('order_id')->where($key,$value)->get();
-////                $order_id = $order_id[0]->order_id;
-////                $Info = Order::with('car')->where('order_id',1)->get(['order_id']);
-////                $info = $Info[0]->car;
-////                $huo_num = 0;
-////                foreach ($info as $k =>$v){
-////                    $huo_num += $v->yuxia_num;
-////                }
-//                //货车的车位
-//                $huo_num = 0;
-//                $y_num = 0;
-//                if(is_array($formData['car_id'])){
-//                    $info = Car::whereIn('car_id',$formData['car_id'])->get(['yuxia_num']);
-//                    foreach ($info as $k =>$v){
-//                        $huo_num += $v->yuxia_num;
-//                    }
-//                }else{
-//                    $info = Car::where('car_id',$formData['car_id'])->get(['yuxia_num']);
-//                    $huo_num = $info[0]->yuxia_num;
-//                }
-//                //被运输的车位
-//                $order_id = $ziyuan->select('order_id')->where($key,$value)->get();
-//                $order_id = $order_id[0]->order_id;
-//                $y_info = OrderVeh::with('veh_type')->where('order_id',$order_id)->get(['type_id','veh_count']);
-//                foreach ($y_info as $k => $v){
-//                    $y_num += $v->veh_count * $v->veh_type->cewei_num;
-//                }
-//                if($huo_num < $y_num) {
-//                    $shuju = ['errorinfo' => '货车单位不足成功'];
-//                    return re_jiami(200, $shuju, $token);
-//                }else{
-//                    //增加关联表的数据
-//                    if(is_array($formData['car_id'])){
-//                        foreach ($formData['car_id'] as $k =>$v){
-//                            $data = [
-//                                'order_id'=>$order_id,
-//                                'car_id' => $k,
-//                            ];
-//                            OrderCar::create($data);
-//                        }
-//                    }else{
-//                        $data = [
-//                            'order_id'=>$order_id,
-//                            'car_id' => $formData['car_id'],
-//                        ];
-//                        OrderCar::create($data);
-//                    }
-//                    unset($formData['car_id']);
-//                }
-//
-//            }
-            $sjk = $info['sjk'];
-            $ziyuan = orm_sjk($sjk);
-            if( !is_object ($ziyuan)){
-                $shuju = ['errorinfo'=>'未找到数据库'];
-                return re_jiami(200,$shuju,$token);
-            }
-            $z = $ziyuan->where($key,$value)->update($formData);;
-            if ($z) {
-                $shuju = ['errorinfo'=>'修改成功'];
-                return re_jiami(200,$shuju,$token);
-            } else {
-                //删除关联表的数据
-                $shuju = ['errorinfo'=>'修改失败'];
-                return re_jiami(500,$shuju,$token);
-            }
-        }
     }
 
-    /**
-     *分配车
-     * @param Request $request
-     * @return array
-     */
-    public function assign_car(Request $request)
-    {
-        if ($request->isMethod('post')){
-            $datainfo =re_jiemi($request);
-            $info = $datainfo[0];
-            $token = $datainfo[1];
-//            $key = $info['key'];
-//            $value = $info['value'];
-            $order_id = $info['order_id'];
-            if(array_key_exists('car_id', $info)){
-                //货车的车位
-                $huo_num = 0;
-                $y_num = 0;
-                if(is_array($info['car_id'])){
-                    $info = Car::whereIn('car_id',$info['car_id'])->get(['yuxia_num']);
-                    foreach ($info as $k =>$v){
-                        $huo_num += $v->yuxia_num;
-                    }
-                }else{
-                    $info = Car::where('car_id',$info['car_id'])->get(['yuxia_num']);
-                    $huo_num = $info[0]->yuxia_num;
-                }
-                //被运输的车位
-
-                $y_info = OrderVeh::with('veh_type')->where('order_id',$order_id)->get(['type_id']);
-                foreach ($y_info as $k => $v){
-                    $y_num += $v->veh_type->cewei_num;
-                }
-                if($huo_num < $y_num) {
-                    $shuju = ['errorinfo' => '货车单位不足成功'];
-                    return re_jiami(200, $shuju, $token);
-                }else{
-                    //增加关联表的数据
-                    if(is_array($info['car_id'])){
-                        foreach ($formData['car_id'] as $k =>$v){
-                            $data = [
-                                'order_id'=>$order_id,
-                                'car_id' => $k,
-                            ];
-                            OrderCar::create($data);
-                        }
-                    }else {
-                        $data = [
-                            'order_id' => $order_id,
-                            'car_id' => $formData['car_id'],
-                        ];
-                        OrderCar::create($data);
-                    }
-                    //去car类请求更改
-                    $shuju = ['errorinfo' => '货车单位充足'];
-                    return re_jiami(200, $shuju, $token);
-                }
-            }
-        }
-
-    }
 
     /**
      * 多个选择删除
@@ -384,7 +256,32 @@ class OrderController extends Controller
     public function delete(Request $request)
     {
         if ($request->isMethod('post')){
-            return shanchu($request);
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            foreach ($info['query'] as $k =>$v){
+                $key  = $k;
+                $value = $v;
+            }
+            $sjk = $info['sjk'];
+            $ziyuan = orm_sjk($sjk);
+            if( !is_object ($ziyuan)){
+                return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
+            }
+            if(is_array($value)){
+                $z = $ziyuan->whereIn($key,$value)->delete();
+                $z_veh = OrderVeh::whereIn('order_id',$value)->delete();
+            }else{
+                $z = $ziyuan->where($key,$value)->delete();
+                $z_veh = OrderVeh::where('order_id',$value)->delete();
+            }
+            if ($z) {
+                $shuju = ['errorinfo'=>'删除成功'];
+                return re_jiami(200,$shuju,$token);
+            } else {
+                $shuju = ['errorinfo'=>'删除失败'];
+                return re_jiami(500,$shuju,$token);
+            }
         }
 
     }
@@ -469,26 +366,60 @@ class OrderController extends Controller
             $data = $info[0];
             $token  = $info[1];
             $car_id = $data['car_id'];
-            $order_id = $data['order_id'];
             //所有更改状态的订单id
             $order_ids = [];
-            if(empty($car_ids)){
+            $i = 0;
+            if(empty($car_id)){
                 $shuju = ['errorinfo'=>'未选中'];
+                return re_jiami(500,$shuju,$token);
+            }
+            $status = Car::where('car_id',$car_id)->limit(1)->get(['state','driver_id']);
+            if($status[0]->state === '运输中' || $status[0]->state === '停运'){
+                $shuju = ['errorinfo'=>'货车不是等待中'];
+                return re_jiami(500,$shuju,$token);
+            }
+            if(empty($status[0]->driver_id)){
+                $shuju = ['errorinfo'=>'请先向该货车分配一名司机，再进行发车'];
                 return re_jiami(500,$shuju,$token);
             }
                 $data_state = ['state'=>'运输中'];
             $z = Car::where('car_id',$car_id)->update($data_state);
             if ($z) {
                 $order_veh =  Car::with('order_veh')->where('car_id',$car_id)->get(['car_id']);
-                foreach ($gai_id[0]->order_veh as $k => $v){
+                foreach ($order_veh[0]->order_veh as $k => $v){
                     if(in_array($v->order_id,$order_ids)){
                         continue;
                     }else{
+                        $order_ids[$i] = $v->order_id;
+                        xieru( 'order_id'.$v->order_id);
+                        $i += 1;
                         $order_state = ['process'=>'运输中'];
-                        $zz = Order::where('order_id',$order_id)->update($order_state);
+                        $zz = Order::where('order_id',$v->order_id)->update($order_state);
                     }
                 }
                 if ($zz) {
+                    //同一个货车发车点一样
+                    $send_info = Order::where('order_id',$order_ids[0])->get(['sender_start_point','sender_pointer_longtitude','sender_pointer_latitude']);
+                    $send_point = $send_info[0]->sender_start_point;
+                    $send_longtitude = $send_info[0]->sender_pointer_longtitude;
+                    $send_latitude = $send_info[0]->sender_pointer_latitude;
+                    $order_str  = implode(',',$order_ids);
+                    xieru('$order_str'.$order_str);
+                    //增加物流信息car_wai中
+                    $car_wai = [
+                        'is_current'=>'2',
+                        'car_id'=>$car_id,
+                        'longitude'=>$send_longtitude,
+                        'latitude'=>$send_latitude,
+                        'address_name'=>$send_point,
+                        'order_ids'=>$order_str,
+                    ];
+                       $zzz =  CarWai::create($car_wai);
+                       if($zzz){
+                       }else{
+                           $shuju = ['errorinfo'=>'首次发车物流更新失败'];
+                           return re_jiami(500,$shuju,$token);
+                       }
                     $shuju = ['errorinfo'=>'已成功发车'];
                     return re_jiami(200,$shuju,$token);
                 } else {
@@ -575,15 +506,48 @@ class OrderController extends Controller
             $info = re_jiemi($request);
             $data = $info[0];
             $token  = $info[1];
-            $order_id = $data['order_id'];
-            $order_state = ['process'=>'已完成'];
-            $z = Order::where('order_id',$order_id)->update($order_state);
-            if ($z) {
-                $shuju = ['errorinfo'=>'收车成功'];
-                return re_jiami(200,$shuju,$token);
-            } else {
-                $shuju = ['errorinfo'=>'收车失败'];
+            $cai_id = $data['cai_id'];
+            $state = Car::where('car_id',$cai_id)->get(['state','unit_total_num']);
+            $unit_total_num = $state[0]->unit_total_num;
+            if($state[0]->state == '停运' || $state[0]->state == '等待中'){
+                $shuju = ['errorinfo'=>'货车不是在运输中'];
                 return re_jiami(500,$shuju,$token);
+            }else{
+                $car_state = ['state'=>'等待中','yuxia_num'=>$unit_total_num];
+                $z = Car::where('car_id',$car_id)->update($car_state);
+                //所在的订单order_id
+                $order_veh =  Car::with('order_veh')->where('car_id',$car_id)->get(['car_id']);
+                $order_ids = [];
+                foreach ($order_veh[0]->order_veh as $k => $v){
+                    if(in_array($v->order_id,$order_ids)){
+                        continue;
+                    }else{
+                        $order_ids[$i] = $v->order_id;
+                        $i += 1;
+                    }
+                }
+                //用0 /1判断订单是否更改
+                $is_gai = 1;//默认是改
+                foreach ($order_ids as $k => $v){
+                    $car_ids =  OrderVeh::where('order_id',$v)->get(['car_id']);
+                    foreach ($car_ids as $kk =>$vv){
+                        if($v->is_current !== '3'){
+                            $is_gai =0;
+                            break;
+                        }
+                    }
+                    if($is_gai){
+                        $order_gai = ['process'=>'待收车'];
+                        $order_id =Order::where('order_id',$v)->update($order_gai);
+                    }
+                }
+                if ($z) {
+                    $shuju = ['errorinfo'=>'收车成功'];
+                    return re_jiami(200,$shuju,$token);
+                } else {
+                    $shuju = ['errorinfo'=>'收车失败'];
+                    return re_jiami(500,$shuju,$token);
+                }
             }
         }
     }

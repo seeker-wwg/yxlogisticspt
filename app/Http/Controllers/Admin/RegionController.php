@@ -54,7 +54,7 @@ class RegionController extends Controller
     public function create(Request $request)
     {
         if ($request->isMethod('post')){
-            return zengjia($request);
+          return zengjia($request);
         }
     }
 }

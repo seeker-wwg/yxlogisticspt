@@ -12,6 +12,7 @@ use App\Http\Models\Region;
 use Illuminate\Support\Facades\DB;
 use zgldh\QiniuStorage\QiniuStorage;
 use App\Http\Models\Freight;
+use App\Http\Models\CarWai;
 use Illuminate\Support\Facades\Session;
 use App\Tools\WcNotify;
 /*
@@ -69,6 +70,7 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
     Route::post( 'field/index','FieldController@index');
 
     Route::post( 'freight/index','FreightController@index');
+    Route::post( 'freight/refresh','FreightController@refresh');
 
     Route::post( 'article/index','ArticleController@index');
 
@@ -88,8 +90,9 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
     //支付完成的post请求
     Route::post('wechat/notify_url', 'WechatController@notify_url');
     //支付功能--结算
-    Route::post('wechat/cart_reserve_jiesuan', 'WechatController@cart_jiesuan');
+//    Route::post('wechat/cart_reserve_jiesuan', 'WechatController@cart_jiesuan');
     Route::get('wechat/jiesuan', 'WechatController@jiesuan');
+    Route::get('wechat/cart_reserve_jiesuan', 'WechatController@cart_reserve_jiesuan');
     //*************************************************************************************
     //上门取送车计费规则
     Route::post('price/create','PriceController@create');
@@ -330,11 +333,17 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 //       $dda = $hel->doSend('oWbEz1iSdXG_H78ZrGvRBvd9AfBE',
 //           'iOCJhOwTL64EHbsm71oCFNtES7PfzpEAuJG1Atf3vmA','http://56.xizangyaxiangwuliu.com',$data);
 //        $gai_id =  OrderVeh::whereIn('order_id',[7])->where('is_load','1')->get();
-        $a = [];
-        if(empty($a)){
-            return 0;
+//        $car_wai = [
+//            'order_ids'=>7,
+//        ];
+//        $zzz =  CarWai::where('wai_id',5)->update($car_wai);
+        $tg = Order::select('order_sn','reserve_price')->where('order_id',7)->where('process','待付款')->get();
+        if(empty($tg[0])){
+            $err =  ['err'=>'订单尚未通过审核'];
+//            return re_jiami(500,$err,$token);
+            return $err;
         }
-//        return $gai_id;
+        return $tg;
     });
 
 
@@ -358,6 +367,7 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
             //装车
             Route::post('order/load_car','OrderController@load_car');
             Route::post('order/unload_car','OrderController@unload_car');
+            Route::post('order/send_car','OrderController@send_car');
 
 
             //用户登录系统

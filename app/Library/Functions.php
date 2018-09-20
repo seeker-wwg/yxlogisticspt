@@ -314,7 +314,7 @@ function shousuo(Request $request){
     if( !is_object ($shujk)){
            return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
     }
-//    $search = $datainfo[8];
+    $search = $datainfo[8];
     $jiansuo = $datainfo[9];
     $created_at = $datainfo[10];
     $updated_at = $datainfo[11];
@@ -354,13 +354,13 @@ function shousuo(Request $request){
                 }
             })
             //$search-->8      '模糊搜索的字段[]'['name'=>'王','phone'=>'158']
-//            ->where(function($query) use($request,$search){
-//                foreach ($search as $k => $v){
-//                    if (!empty($v)){
-//                            $query->where($k,'like',"%$v%");
-//                    }
-//                }
-//            })
+            ->where(function($query) use($request,$search){
+                foreach ($search as $k => $v){
+                    if ($v == '0' || !empty($v) ){
+                        $query->where($k,'like',"%$v%");
+                    }
+                }
+            })
             //$created_at -->10  '时间搜索'
             ->where(function ($query) use($request,$created_at){
                 if ( !empty($created_at)){
@@ -391,6 +391,13 @@ function shousuo(Request $request){
                         $query->where($k, null);
                     }else if($v == 'de'){
                         $query->where($k, '!=',null);
+                    }
+                }
+            })
+            ->where(function($query) use($request,$search){
+                foreach ($search as $k => $v){
+                    if ($v == '0' || !empty($v) ){
+                        $query->where($k,'like',"%$v%");
                     }
                 }
             })
@@ -467,7 +474,7 @@ function jiami_shousuo(Request $request){
             //            $search-->8      '模糊搜索的字段[]'['name'=>'王','phone'=>'158']
             ->where(function($query) use($request,$search){
                 foreach ($search as $k => $v){
-                    if (!empty($v)){
+                    if ($v == '0' || !empty($v) ){
                         $query->where($k,'like',"%$v%");
                     }
                 }
@@ -508,8 +515,8 @@ function jiami_shousuo(Request $request){
             //$search-->8      '模糊搜索的字段[]'['name'=>'王','phone'=>'158']
             ->where(function($query) use($request,$search){
                 foreach ($search as $k => $v){
-                    if (!empty($v)){
-                            $query->where($k,'like',"%$v%");
+                    if ($v == '0' || !empty($v) ){
+                        $query->where($k,'like',"%$v%");
                     }
                 }
             })

@@ -17,7 +17,7 @@ class Order extends Model
 
         'sender_longitude','sender_latitude',
         'sender_detail_add',
-        'sender_phone','receiver_name', 'receive_type','receive_start_point',
+        'sender_phone','receive_name', 'receive_type','receive_start_point',
         'receive_pointer_longtitude','receive_pointer_latitude','sender_pointer_add',
         'receive_add',
 

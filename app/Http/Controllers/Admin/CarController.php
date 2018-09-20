@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 header("Access-Control-Allow-Origin:*"); //*号表示所有域名都可以访问
 header("Access-Control-Allow-Method:POST,GET");
 use App\Http\Models\Car;
+use App\Http\Models\CarWai;
 use App\Http\Models\CarTypeNum;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -209,6 +210,42 @@ class CarController extends Controller
 
         }
     }
+
+
+    /**
+     * 更新物流
+     * @param Request $request
+     * @return array
+     */
+    public function car_wai_update(Request $request)
+    {
+        if ($request->isMethod('post')){
+            $info = re_jiemi($request);
+            $data1 = $info[0];
+            $token = $info[1];
+            $car_id  = $data1['car_id'];
+            $longitude = $data1['longitude'];
+            $latitude  = $data1['latitude'];
+            $address_name  = $data1['address_name'];
+            $last_car_wai =  CarWai::where('car_id',$car_id)->where('is_current','2')->limit(1)->get()->toArray();
+            $last_car_wai = $last_car_wai[0];
+            $last_car_wai['longitude'] = $longitude;
+            $last_car_wai['latitude'] = $latitude;
+            $last_car_wai['address_name'] = $address_name;
+            $last_car_wai['is_current'] = '1';
+           $z =  CarWai::create($last_car_wai);
+                if ($z) {
+                    $shuju = ['errorinfo'=>'新增物流成功'];
+                    return re_jiami(200,$shuju,$token);
+                } else {
+                    $shuju = ['errorinfo'=>'新增物流失败'];
+                    return re_jiami(500,$shuju,$token);
+                }
+            }
+    }
+
+
+
     /**
      * import
      * @param Request $request

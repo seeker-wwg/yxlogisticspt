@@ -21,7 +21,7 @@ class Fanqiang
         //当前请求路由
         $Cur_path = $request->path();
         //允许通过的接口
-        $allow_url = ['admin/upload/upload_img'];
+        $allow_url = ['admin/upload/upload_img','admin/wechat/cart_reserve_jiesuan'];
         if(!in_array($Cur_path,$allow_url)){
             if($request->has('mg_id')){
                 $user_id = $request->input('mg_id');
