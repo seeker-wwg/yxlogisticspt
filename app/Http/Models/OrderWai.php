@@ -11,9 +11,7 @@ class OrderWai extends Model
     protected $primaryKey = "wai_id"; //主键名字
     protected $fillable = [
         'order_id', 'status_updata',
-        'status_updata_time', 'mg_id',
-        'longitude', 'latitude',
-        'cur_add',
+        'status_updata_time',
         'created_at', 'updated_at', 'deleted_at'
     ];//数据添加、修改时允许维护的字段
     public function order()
@@ -25,6 +23,4 @@ class OrderWai extends Model
     {
         return $this->hasOne('\App\Http\Models\Manager', 'mg_id', 'mg_id');
     }
-    use SoftDeletes;
-    protected $dates = ['deleted_at'];
 }

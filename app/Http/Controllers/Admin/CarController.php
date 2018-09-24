@@ -118,7 +118,7 @@ class CarController extends Controller
             }
             $z = $ziyuan->create($formData);
             if ($z) {
-                $shuju = ['errorinfo'=>'增加成功'];
+                $shuju = ['errorinfo'=>'增加成功','car_id'=>$z];
                 return re_jiami(200,$shuju,$token);
             } else {
                 $shuju = ['errorinfo'=>'增加失败'];

@@ -10,7 +10,7 @@ class UserMsg extends Model
     protected $table = "user_msg"; //表名
     protected $primaryKey = "id"; //主键名字
     protected $fillable = [
-        'user_id', 'msg_id','status',
+        'who','who_id', 'msg_id','status',
         'created_at', 'updated_at', 'deleted_at'
     ];//数据添加、修改时允许维护的字段
     public function user()
@@ -21,6 +21,4 @@ class UserMsg extends Model
     {
         return $this->hasOne('\App\Http\Models\Msg', 'msg_id', 'msg_id');
     }
-    use SoftDeletes;
-    protected $dates = ['deleted_at'];
 }

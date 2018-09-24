@@ -14,6 +14,7 @@ use App\Http\Models\Order;
 use App\Http\Models\Msg;
 use App\Http\Models\VehType;
 use App\Http\Models\OrderVeh;
+use App\Http\Models\OrderWai;
 use App\Http\Models\Uadd;
 use App\Http\Models\Freight;
 use App\Http\Models\Field;
@@ -121,6 +122,11 @@ function orm_sjk($sjk_name){
             break;
         case 'order_veh':
             $info = OrderVeh::where(function ($query){
+                if(empty(1)){$query->where('order_sn', 'like', "%5acf0%");}
+            });
+            return $info;
+        case 'order_wai':
+            $info = OrderWai::where(function ($query){
                 if(empty(1)){$query->where('order_sn', 'like', "%5acf0%");}
             });
             return $info;

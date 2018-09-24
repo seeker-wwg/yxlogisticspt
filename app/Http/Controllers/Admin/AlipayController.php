@@ -102,7 +102,41 @@ class AlipayController extends Controller
         }
     }
 
+    /**
+     * 购物车"去结算剩余"支付宝操作
+     * @param Request $request
+     */
+    public function find_order(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            //获取前端提交的信息
+            $datainfo = re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            //需要判断订单的id是不是已通过审核
+            $tg = Order::select('order_sn','stay_price')->where('order_id',$info['id'])
+                ->get();
+            if(!$tg){
+                $err =  ['err'=>'订单尚未通过审核'];
+                return re_jiami(500,$err,$token);
+            }
 
+            //⑤ 对订单进行支付
+            //商户订单号，商户网站订单系统中唯一订单号，必填
+            $out_trade_no = $tg[0]['order_sn'];
+            //订单名称，必填
+            $subject = 'yxwl' . time();
+            //付款金额，必填
+            $total_amount = $tg[0]['stay_price'];
+            //商品描述，可空
+            $body = '';
+
+            $customData = json_encode(['model_name' => 'ewrwe', 'id' => 121]);//自定义参数
+            $response = Alipay::tradePagePay($subject, $body, $out_trade_no, $total_amount, $customData);
+            //输出表单
+            return $response['redirect_url'];
+        }
+    }
 
     /**
      * 支付宝向商家发起的get同步请求

@@ -31,7 +31,9 @@ return [
         'mch_id' => '1338283501',
 
         // 微信支付异步通知地址
-        'notify_url' => 'http://www.yxlogisticspt.com/admin/wechat/notify_url',
+        'notify_url' => 'http://56.xizangyaxiangwuliu.com/admin/wechat/notify',
+
+
 
         // 微信支付签名秘钥
         'key' => 'Yaxiangwuliu15076447777Yaxiangwu',

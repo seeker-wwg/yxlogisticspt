@@ -57,6 +57,10 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 // 微信接口回调地址
     Route::get('auth/callback', 'AuthController@callback');
 
+    //首页
+    Route::post('home/dsyc', 'HomeController@dsyc');
+    Route::get('home/order_count', 'HomeController@order_count');
+
     //用户或管理员退出
     Route::post('user/logout','UserController@logout');
     Route::post('driver/logout','DriverController@logout');
@@ -74,7 +78,7 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 
     Route::post( 'article/index','ArticleController@index');
 
-
+    Route::post('help/index','HelpController@index');
     Route::post( 'vehtype/index','VehTypeController@index');
 
     //支付功能_________**************************************************************
@@ -88,11 +92,13 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
     //----微信
 
     //支付完成的post请求
-    Route::post('wechat/notify_url', 'WechatController@notify_url');
+    Route::post('wechat/notify', 'WechatController@notify');
     //支付功能--结算
 //    Route::post('wechat/cart_reserve_jiesuan', 'WechatController@cart_jiesuan');
     Route::get('wechat/jiesuan', 'WechatController@jiesuan');
-    Route::get('wechat/cart_reserve_jiesuan', 'WechatController@cart_reserve_jiesuan');
+
+    Route::post('wechat/cart_reserve_jiesuan', 'WechatController@cart_reserve_jiesuan');
+    Route::post('wechat/find_order', 'WechatController@find_order');
     //*************************************************************************************
     //上门取送车计费规则
     Route::post('price/create','PriceController@create');
@@ -337,13 +343,9 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 //            'order_ids'=>7,
 //        ];
 //        $zzz =  CarWai::where('wai_id',5)->update($car_wai);
-        $tg = Order::select('order_sn','reserve_price')->where('order_id',7)->where('process','待付款')->get();
-        if(empty($tg[0])){
-            $err =  ['err'=>'订单尚未通过审核'];
-//            return re_jiami(500,$err,$token);
-            return $err;
-        }
-        return $tg;
+        $order_sn = uniqid('');
+        //133332
+        dd(date('Y-m-d H:i:s', strtotime(20180921133332)));
     });
 
 
@@ -376,6 +378,11 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
             Route::post('user/update','UserController@update');
             Route::post('user/delete','UserController@delete');
 
+
+            //帮助协议
+            Route::post('help/create','HelpController@create');
+            Route::post('help/update','HelpController@update');
+            Route::post('help/delete','HelpController@delete');
 
             //司机管理
             Route::post('driver/create','DriverController@create');
