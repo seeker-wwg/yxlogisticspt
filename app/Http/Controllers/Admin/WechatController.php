@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 header("Access-Control-Allow-Origin:*"); //*号表示所有域名都可以访问
 header("Access-Control-Allow-Method:POST,GET");
-use App\Http\Models\Article;
+use App\Http\Models\OrderWai;
 use App\Http\Models\Driver;
 use App\Http\models\Order;
 use App\Http\models\OrderVeh;
@@ -52,7 +52,7 @@ trade_state_desc: "支付成功"
                 //商户订单号
                        $out_trade_no = $a['out_trade_no'];
                         //① 实现订单由"未付款"变为"已付款"  并且判断一下是否为定金  或尾款
-                        $order_info = Order::where('order_sn',$out_trade_no)->limit(1)->get()->toArray();
+                        $order_info = Order::where('order_sn',$out_trade_no)->limit(1)->get();
                         $d_trade_sn = $order_info[0];
                         if(empty($d_trade_sn)){
                             $rst = Order::where('order_sn',$out_trade_no)
@@ -63,6 +63,8 @@ trade_state_desc: "支付成功"
                                     'dingjin_payment_method' => '微信支付',
                                 ]);
                             if ($rst) {
+                                $data_wai = ['order_id'=> $d_trade_sn->order_id,'status_updata'=>'待接车','status_updata_time'=>date('Y-m-d H:i:s', time())];
+                                OrderWai::create($data_wai);
                                 $shuju = ['errorinfo'=>'定金付款成功，数据库数据更新成功'];
                                 return wei_jiami(200,$shuju);
                             } else {
@@ -78,6 +80,8 @@ trade_state_desc: "支付成功"
                                     'weikuang_payment_method' => '微信支付',
                                 ]);
                             if ($w_rst) {
+                                $data_wai = ['order_id'=> $d_trade_sn->order_id,'status_updata'=>'已完成','status_updata_time'=>date('Y-m-d H:i:s', time())];
+                                OrderWai::create($data_wai);
                                 $shuju = ['errorinfo'=>'尾款付款成功，数据库数据更新成功'];
                                     return wei_jiami(200,$shuju);
                             } else {

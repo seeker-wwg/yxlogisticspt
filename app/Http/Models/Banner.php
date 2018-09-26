@@ -17,6 +17,6 @@ class Banner extends Model
 //    {
 //        return $this->hasOne('\App\Http\Models\User', 'user_id', 'user_id');
 //    }
-    use SoftDeletes;
-    protected $dates = ['deleted_at'];
+//    use SoftDeletes;
+//    protected $dates = ['deleted_at'];
 }

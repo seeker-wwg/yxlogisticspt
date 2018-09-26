@@ -5,8 +5,11 @@ header("Access-Control-Allow-Origin:*"); //*号表示所有域名都可以访问
 header("Access-Control-Allow-Method:POST,GET");
 use App\Http\Models\Order;
 use App\Http\models\OrderComment;
+use App\Http\models\Msg;
+use App\Http\models\UserMsg;
 use App\Http\models\OrderVeh;
 use App\Http\models\OrderCar;
+use App\Http\models\OrderWai;
 use App\Http\models\Vehicle;
 use App\Http\Models\Manager;
 use App\Http\Models\Freight;
@@ -190,7 +193,10 @@ class OrderController extends Controller
             $sjk = $info['sjk'];
             $car_data = $info['car_data'];
             $freight_id = $info['freight_id'];
+            //定金
             $order_sn = uniqid('');
+           // 尾款
+            $w_order_sn = uniqid('');
             //计算总价
             //1.车的费用
 //            $car_cost = Freight::whereIn('freight_id',$freight_id)->get(['freight_cost')->toArray();
@@ -221,20 +227,22 @@ class OrderController extends Controller
             if( !is_object ($ziyuan)){
                 return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
             }
-            $z = $ziyuan->create($formData);
-
             $formData['order_sn'] = $order_sn;
-            if(!empty($car_data)){
-                foreach ($car_data as $v) {
-                    $v['order_id'] =$z;
-                    OrderVeh::create($v);
-                }
-            }
+            $formData['w_order_sn'] = $w_order_sn;
+            $z = $ziyuan->create($formData);
             if ($z) {
-                $shuju = ['errorinfo'=>'增加成功'];
+                if(!empty($car_data)){
+                    foreach ($car_data as $v) {
+                        $v['order_id'] =$z->order_id;
+                        OrderVeh::create($v);
+                    }
+                }
+                $data_wai = ['order_id'=>$z->order_id,'status_updata'=>'审核中','status_updata_time'=>date('Y-m-d H:i:s', time())];
+                OrderWai::create($data_wai);
+                $shuju = ['errorinfo'=>'生成订单成功'];
                 return re_jiami(200,$shuju,$token);
             } else {
-                $shuju = ['errorinfo'=>'增加失败'];
+                $shuju = ['errorinfo'=>'生成订单失败'];
                 return re_jiami(500,$shuju,$token);
             }
         }
@@ -247,7 +255,75 @@ class OrderController extends Controller
             }
     }
 
-
+    public function update_process(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            $formData = $info['formData'];
+            $order_id = $info['order_id'];
+            $z = Order::where('order_id',$order_id)->update($formData);
+            if ($z) {
+               $uo_msg = Order::where('order_id',$order_id)-get(['order_sn','user_id','process','not_pass']);
+                if($formData['process'] == '待付款'){
+                    //创建用户推荐消息
+                    $user_msg  =[
+                        'mg_id'=>0,
+                        'title'=>'你有待付款的订单',
+                        'content'=>'你有订单号为'.$uo_msg[0]->order_sn.',已审核通过请付款',
+                        ];
+                  $mz =  Msg::create($user_msg);
+                  $ut_msg = [
+                      'who'=>'user',
+                      'who_id'=>$uo_msg[0]->user_id,
+                      'msg_id'=>$mz->msg_id,
+                      'status'=>'未读',
+                  ];
+                    $tz =  UserMsg::create($ut_msg);
+                }
+                if($formData['process'] == '已完成'){
+                    //创建用户推荐消息
+                    $user_msg  =[
+                        'mg_id'=>0,
+                        'title'=>'你有订单已完成收车',
+                        'content'=>'你有订单号为'.$uo_msg[0]->order_sn.',已完成收车',
+                    ];
+                    $mz =  Msg::create($user_msg);
+                    $ut_msg = [
+                        'who'=>'user',
+                        'who_id'=>$uo_msg[0]->user_id,
+                        'msg_id'=>$mz->msg_id,
+                        'status'=>'未读',
+                    ];
+                    $tz =  UserMsg::create($ut_msg);
+                }
+                if($uo_msg[0]->process == '已取消' && !empty($uo_msg[0]->not_pass)){
+                    //创建用户推荐消息
+                    $user_msg  =[
+                        'mg_id'=>0,
+                        'title'=>'你有订单审核未通过',
+                        'content'=>'你有订单号为'.$uo_msg[0]->order_sn.',审核未通过,原因是:'.$uo_msg[0]->not_pass,
+                    ];
+                    $mz =  Msg::create($user_msg);
+                    $ut_msg = [
+                        'who'=>'user',
+                        'who_id'=>$uo_msg[0]->user_id,
+                        'msg_id'=>$mz->msg_id,
+                        'status'=>'未读',
+                    ];
+                    $tz =  UserMsg::create($ut_msg);
+                }
+                $data_wai = ['order_id'=> $order_id,'status_updata'=>$formData['process'],'status_updata_time'=>date('Y-m-d H:i:s', time())];
+                OrderWai::create($data_wai);
+                $shuju = ['errorinfo'=>'订单状态修改成功'];
+                return re_jiami(200,$shuju,$token);
+            } else {
+                $shuju = ['errorinfo'=>'订单状态修改失败'];
+                return re_jiami(500,$shuju,$token);
+            }
+        }
+    }
     /**
      * 多个选择删除
      * @param Request $request
@@ -385,16 +461,47 @@ class OrderController extends Controller
                 $data_state = ['state'=>'运输中'];
             $z = Car::where('car_id',$car_id)->update($data_state);
             if ($z) {
+              $d_car =  Car::where('car_id',$car_id)->get(['driver_id','car_name']);
+                //创建司机推荐消息
+                $user_msg  =[
+                    'mg_id'=>0,
+                    'title'=>'你有货车要开始配送',
+                    'content'=>'你有货车'.$d_car[0]->car_name.',要开始配送',
+                ];
+                $mz =  Msg::create($user_msg);
+                $ut_msg = [
+                    'who'=>'driver',
+                    'who_id'=>$d_car[0]->driver_id,
+                    'msg_id'=>$mz->msg_id,
+                    'status'=>'未读',
+                ];
+                $tz =  UserMsg::create($ut_msg);
                 $order_veh =  Car::with('order_veh')->where('car_id',$car_id)->get(['car_id']);
                 foreach ($order_veh[0]->order_veh as $k => $v){
                     if(in_array($v->order_id,$order_ids)){
                         continue;
                     }else{
                         $order_ids[$i] = $v->order_id;
-                        xieru( 'order_id'.$v->order_id);
+//                        xieru( 'order_id'.$v->order_id);
                         $i += 1;
                         $order_state = ['process'=>'运输中'];
                         $zz = Order::where('order_id',$v->order_id)->update($order_state);
+                        //向所属订单的用户推送消息
+                        //创建用户推荐消息
+                        $uo_msg = Order::where('order_id',$v->order_id)-get(['order_sn','user_id']);
+                        $user_msg  =[
+                            'mg_id'=>0,
+                            'title'=>'你的订单已经开始配送',
+                            'content'=>'你有订单号为'.$uo_msg[0]->order_sn.'已经开始配送,请关注物流信息',
+                        ];
+                        $mz =  Msg::create($user_msg);
+                        $ut_msg = [
+                            'who'=>'user',
+                            'who_id'=>$uo_msg[0]->user_id,
+                            'msg_id'=>$mz->msg_id,
+                            'status'=>'未读',
+                        ];
+                        $mz =  UserMsg::create($ut_msg);
                     }
                 }
                 if ($zz) {
@@ -404,7 +511,7 @@ class OrderController extends Controller
                     $send_longtitude = $send_info[0]->sender_pointer_longtitude;
                     $send_latitude = $send_info[0]->sender_pointer_latitude;
                     $order_str  = implode(',',$order_ids);
-                    xieru('$order_str'.$order_str);
+//                    xieru('$order_str'.$order_str);
                     //增加物流信息car_wai中
                     $car_wai = [
                         'is_current'=>'2',

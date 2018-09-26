@@ -10,7 +10,7 @@ class Msg extends Model
     protected $table = "msg"; //表名
     protected $primaryKey = "msg_id"; //主键名字
     protected $fillable = [
-        'title', 'content',
+        'mg_id','title', 'content',
         'created_at', 'updated_at', 'deleted_at'
     ];//数据添加、修改时允许维护的字段
 //    public function user()
@@ -46,8 +46,8 @@ class Msg extends Model
          * 第三个参数：当前表跟中间表对应的外键
          * 第四个参数：要关联的表跟中间表对应的外键
          * */
-        return $this->belongsToMany('\App\Http\Models\Manager','manager_msg','msg_id','mg_id');
+        return $this->hasOne('\App\Http\Models\Manager','msg_id','mg_id');
     }
-    use SoftDeletes;
-    protected $dates = ['deleted_at'];
+//    use SoftDeletes;
+//    protected $dates = ['deleted_at'];
 }

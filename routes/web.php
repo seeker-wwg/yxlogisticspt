@@ -4,6 +4,7 @@ use App\Http\Models\User;
 use App\Http\Models\Order;
 use App\Http\Models\OrderVeh;
 use App\Http\Models\Car;
+use App\Http\Models\Help;
 use App\Http\Models\Manager;
 use App\Http\Models\Driver;
 use App\Http\Models\Permission;
@@ -41,7 +42,9 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
         //用户登录系统
         Route::post('user/login','UserController@login');
         Route::post('user/sendSMS',  'UserController@sendSMS');
+
         Route::post('user/checkCode','UserController@checkCode');
+
         //司机登录系统
         Route::post('driver/login','DriverController@login');
         Route::post('driver/sendSMS','DriverController@sendSMS');
@@ -51,11 +54,15 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
         Route::post('manager/sendSMS','ManagerController@sendSMS');
         Route::post('manager/checkCode','ManagerController@checkCode');
     });
+    Route::post('user/register','UserController@register');
+    Route::post('user/zc_sendSMS',  'UserController@zc_sendSMS');
+    Route::post('user/update_pw',  'UserController@update_pw');
     //用户点击登录按钮时请求的地址
     Route::get('auth/oauth', 'AuthController@oauth');
 
 // 微信接口回调地址
     Route::get('auth/callback', 'AuthController@callback');
+
 
     //首页
     Route::post('home/dsyc', 'HomeController@dsyc');
@@ -76,7 +83,7 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
     Route::post( 'freight/index','FreightController@index');
     Route::post( 'freight/refresh','FreightController@refresh');
 
-    Route::post( 'article/index','ArticleController@index');
+    Route::post( 'protocol/index','ProtocolController@index');
 
     Route::post('help/index','HelpController@index');
     Route::post( 'vehtype/index','VehTypeController@index');
@@ -343,9 +350,9 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 //            'order_ids'=>7,
 //        ];
 //        $zzz =  CarWai::where('wai_id',5)->update($car_wai);
-        $order_sn = uniqid('');
-        //133332
-        dd(date('Y-m-d H:i:s', strtotime(20180921133332)));
+        Help::truncate();
+
+
     });
 
 
@@ -354,127 +361,130 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
             //是否可以这样  Route::group(['middleware'=> ['yanzheng','fanqiang']],function() {
         Route::group(['middleware'=>'yanzheng'],function() {
             Route::group(['middleware'=>'fanqiang'],function (){
-            //订单管理
-            Route::post( 'order/index','OrderController@index');
-            Route::post('order/create','OrderController@create');
-            Route::post('order/update','OrderController@update');
-            Route::post('order/delete','OrderController@delete');
-            Route::post('order/assign_car','OrderController@assign_car');
+                Route::group(['middleware'=>'AdminOperationLog'],function (){
+                //订单管理
+                Route::post( 'order/index','OrderController@index');
+                Route::post('order/create','OrderController@create');
+                Route::post('order/update','OrderController@update');
+                Route::post('order/delete','OrderController@delete');
+                Route::post('order/assign_car','OrderController@assign_car');
 
-            Route::post( 'order/comment','OrderController@comment');
-            Route::post( 'order/comment_create','OrderController@comment_create');
-            Route::post( 'order/delCar','OrderController@delCar');
-            Route::post( 'order/createCar','OrderController@createCar');
-            Route::post('order/up_pic','OrderController@up_pic');
-            //装车
-            Route::post('order/load_car','OrderController@load_car');
-            Route::post('order/unload_car','OrderController@unload_car');
-            Route::post('order/send_car','OrderController@send_car');
+                Route::post( 'order/comment','OrderController@comment');
+                Route::post( 'order/comment_create','OrderController@comment_create');
+                Route::post( 'order/createCar','OrderController@createCar');
+                Route::post('order/up_pic','OrderController@up_pic');
+                //装车
 
-
-            //用户登录系统
-            Route::post('user/index', 'UserController@index');
-            Route::post('user/create','UserController@create');
-            Route::post('user/update','UserController@update');
-            Route::post('user/delete','UserController@delete');
+                Route::post( 'order/update_process','OrderController@update_process');
+                Route::post('order/load_car','OrderController@load_car');
+                Route::post('order/unload_car','OrderController@unload_car');
+                Route::post('order/send_car','OrderController@send_car');
 
 
-            //帮助协议
-            Route::post('help/create','HelpController@create');
-            Route::post('help/update','HelpController@update');
-            Route::post('help/delete','HelpController@delete');
-
-            //司机管理
-            Route::post('driver/create','DriverController@create');
-            Route::post('driver/update','DriverController@update');
-            Route::post('driver/delete','DriverController@delete');
-            Route::post('driver/index','DriverController@index');
+                //用户登录系统
+                Route::post('user/index', 'UserController@index');
+                Route::post('user/create','UserController@create');
+                Route::post('user/update','UserController@update');
+                Route::post('user/delete','UserController@delete');
 
 
+                //帮助协议
+                Route::post('help/create','HelpController@create');
+                Route::post('help/update','HelpController@update');
+                Route::post('help/delete','HelpController@delete');
 
-            //管理员管理
-            Route::post('manager/create','ManagerController@create');
-            Route::post('manager/update','ManagerController@update');
-            Route::post('manager/delete','ManagerController@delete');
-            Route::post('manager/index','ManagerController@index');
-
-            //地址管理
-            Route::post('uadd/create','UaddController@create');
-            Route::post('uadd/update','UaddController@update');
-            Route::post('uadd/delete','UaddController@delete');
-            Route::post( 'uadd/index','UaddController@index');
+                //司机管理
+                Route::post('driver/create','DriverController@create');
+                Route::post('driver/update','DriverController@update');
+                Route::post('driver/delete','DriverController@delete');
+                Route::post('driver/index','DriverController@index');
 
 
 
+                //管理员管理
+                Route::post('manager/create','ManagerController@create');
+                Route::post('manager/update','ManagerController@update');
+                Route::post('manager/delete','ManagerController@delete');
+                Route::post('manager/index','ManagerController@index');
 
-            //平台运输车辆管理
-            Route::post('trucks/create','TrucksController@create');
-            Route::post('trucks/update','TrucksController@update');
-            Route::post('trucks/delete','TrucksController@delete');
-            Route::post( 'trucks/index','TrucksController@index');
-
-
-            //车辆管理
-            Route::post('car/create','CarController@create');
-            Route::post('car/update','CarController@update');
-            Route::post('car/delete','CarController@delete');
-            Route::post( 'car/index','CarController@index');
-            Route::post( 'car/import','CarController@import');
-            Route::get( 'car/export','CarController@export');
-            Route::post( 'car/add_siji','CarController@add_siji');
-            Route::post( 'car/cancel_siji','CarController@cancel_siji');
-
-            //平台消息列表管理
-            Route::post('msg/create','MsgController@create');
-            Route::post('msg/update','MsgController@update');
-            Route::post('msg/delete','MsgController@delete');
-            Route::post('msg/index','MsgController@index');
-
-            Route::post('msg/number','MsgController@number');
-            Route::post('msg/status','MsgController@status');
-            Route::post('msg/userid','MsgController@userid');
-
-            //轮播图管理
-            Route::post('banner/create','BannerController@create');
-            Route::post('banner/update','BannerController@update');
-            Route::post('banner/delete','BannerController@delete');
+                //地址管理
+                Route::post('uadd/create','UaddController@create');
+                Route::post('uadd/update','UaddController@update');
+                Route::post('uadd/delete','UaddController@delete');
+                Route::post( 'uadd/index','UaddController@index');
 
 
 
-            //角色列表管理
-            Route::post('role/create','RoleController@create');
-            Route::post('role/update','RoleController@update');
-            Route::post('role/delete','RoleController@delete');
-            Route::post( 'role/index','RoleController@index');
 
-            //帮助文章管理
-            Route::post('article/create','ArticleController@create');
-            Route::post('article/update','ArticleController@update');
-            Route::post('article/delete','ArticleController@delete');
+                //平台运输车辆管理
+                Route::post('trucks/create','TrucksController@create');
+                Route::post('trucks/update','TrucksController@update');
+                Route::post('trucks/delete','TrucksController@delete');
+                Route::post( 'trucks/index','TrucksController@index');
 
 
-            //运输区域管理
-            Route::post('region/create','RegionController@create');
-            Route::post('region/update','RegionController@update');
-            Route::post('region/delete','RegionController@delete');
+                //车辆管理
+                Route::post('car/create','CarController@create');
+                Route::post('car/update','CarController@update');
+                Route::post('car/delete','CarController@delete');
+                Route::post( 'car/index','CarController@index');
+                Route::post( 'car/import','CarController@import');
+                Route::get( 'car/export','CarController@export');
+                Route::post( 'car/add_siji','CarController@add_siji');
+                Route::post( 'car/cancel_siji','CarController@cancel_siji');
+
+                //平台消息列表管理
+                Route::post('msg/create','MsgController@create');
+                Route::post('msg/pushmsg','MsgController@pushmsg');
+                Route::post('msg/delete','MsgController@delete');
+                Route::post('msg/index','MsgController@index');
+
+                Route::post('msg/number','MsgController@number');
+                Route::post('msg/status','MsgController@status');
+                Route::post('msg/userid_index','MsgController@userid');
+                //轮播图管理
+                Route::post('banner/create','BannerController@create');
+                Route::post('banner/update','BannerController@update');
+                Route::post('banner/delete','BannerController@delete');
+
+                Route::post('wbanner/create','WBannerController@create');
+                Route::post('wbanner/update','WBannerController@update');
+                Route::post('wbanner/delete','WBannerController@delete');
+                //角色列表管理
+                Route::post('role/create','RoleController@create');
+                Route::post('role/update','RoleController@update');
+                Route::post('role/delete','RoleController@delete');
+                Route::post( 'role/index','RoleController@index');
+
+                //帮助文章管理
+                Route::post('protocol/create','ProtocolController@create');
+                Route::post('protocol/update','ProtocolController@update');
+                Route::post('protocol/delete','ProtocolController@delete');
 
 
-            //平台运输车辆管理
-            Route::post('freight/create','FreightController@create');
-            Route::post('freight/update','FreightController@update');
-            Route::post('freight/delete','FreightController@delete');
-            //获取单一字段
-            Route::post('field/create','FieldController@create');
-            Route::post('field/update','FieldController@update');
-            Route::post('field/delete','FieldController@delete');
-            //上传
-            Route::post('upload/upload_img','UploadController@upload_img');
+                //运输区域管理
+                Route::post('region/create','RegionController@create');
+                Route::post('region/update','RegionController@update');
+                Route::post('region/delete','RegionController@delete');
 
-            //测试
-            Route::post( 'jia/mimi',function (Request $request){
-                $info = Region::get();
-                return $info;
-            });
+
+                //平台运输车辆管理
+                Route::post('freight/create','FreightController@create');
+                Route::post('freight/update','FreightController@update');
+                Route::post('freight/delete','FreightController@delete');
+                //获取单一字段
+                Route::post('field/create','FieldController@create');
+                Route::post('field/update','FieldController@update');
+                Route::post('field/delete','FieldController@delete');
+                //上传
+                Route::post('upload/upload_img','UploadController@upload_img');
+
+                //测试
+                Route::post( 'jia/mimi',function (Request $request){
+                    $info = Region::get();
+                    return $info;
+                });
+           });
         });
     });
 

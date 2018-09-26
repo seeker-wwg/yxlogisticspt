@@ -63,5 +63,6 @@ class Kernel extends HttpKernel
         'fanqiang' => \App\Http\Middleware\Fanqiang::class,
         'yanzheng' => \App\Http\Middleware\Yanzheng::class,
         'loginyz' => \App\Http\Middleware\Loginyz::class,
+        'AdminOperationLog' => \App\Http\Middleware\AdminOperationLog::class,
     ];
 }

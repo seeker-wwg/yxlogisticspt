@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 header("Access-Control-Allow-Origin:*"); //*号表示所有域名都可以访问
 header("Access-Control-Allow-Method:POST,GET");
-use App\Http\Models\Article;
+use App\Http\Models\Protocol;
 use App\Http\Models\Driver;
 use App\Http\models\Order;
 use App\Http\models\OrderVeh;

@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Models;
+namespace App\Http\models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class OperationLog extends Model
+class ZcTempPhone extends Model
 {
-    protected $table = "operation_log"; //表名
+    protected $table = "zctemp_phone"; //表名
     protected $primaryKey = "id"; //主键名字
     protected $fillable = [
-        'uid','identity','name',
-        'path_name','path','ip','created_at'
-        ,'updated_at','deleted_at'
+        'phone','code', 'deadline',
+        'created_at', 'updated_at', 'deleted_at'
     ];//数据添加、修改时允许维护的字段
+
 }

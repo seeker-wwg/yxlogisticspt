@@ -11,11 +11,13 @@ use App\Http\Models\Car;
 use App\Http\Models\Driver;
 use App\Http\Models\Manager;
 use App\Http\Models\Order;
+use App\Http\Models\Protocol;
 use App\Http\Models\Msg;
 use App\Http\Models\VehType;
 use App\Http\Models\OrderVeh;
 use App\Http\Models\OrderWai;
 use App\Http\Models\Uadd;
+use App\Http\Models\ZcTempPhone;
 use App\Http\Models\Freight;
 use App\Http\Models\Field;
 use App\Http\Models\Banner;
@@ -110,6 +112,12 @@ function orm_sjk($sjk_name){
             break;
         case 'msg':
             $info = Msg::where(function ($query){
+                if(empty(1)){$query->where('order_sn', 'like', "%5acf0%");}
+            });
+            return $info;
+            break;
+        case 'protocol':
+            $info = Protocol::where(function ($query){
                 if(empty(1)){$query->where('order_sn', 'like', "%5acf0%");}
             });
             return $info;
@@ -563,16 +571,20 @@ function jiami_shousuo(Request $request){
  * 要传入  data{formData:{数组},sjk:'dd'}
  */
 function phone_yz($phone,$role){
-    if($role = 'user_id'){
+    if($role == 'user_id'){
         $mg_id = User::select('phone')->where('phone', $phone)->limit(1)->get()->toArray();
+        xieru(1);
     }
-    if($role = 'driver_id'){
+    if($role == 'driver_id'){
         $mg_id = Driver::select('phone')->where('phone', $phone)->limit(1)->get()->toArray();
+        xieru(2);
     }
-    if($role = 'mg_id'){
+    if($role == 'mg_id'){
         $mg_id = Manager::select('phone')->where('phone', $phone)->limit(1)->get()->toArray();
+        xieru(3);
     }
-    if(!empty($mg_id[0])){
+    xieru($mg_id);
+    if(!empty($mg_id)){
         return true;
     }
 }
@@ -782,8 +794,6 @@ function luoji_zengjia($sjk,$formData,$token){
         return re_jiami(500,$shuju,$token);
     }
 }
-
-
 
 //-----------------------------------------------------
 /**
@@ -1220,5 +1230,68 @@ function mul_sort($data,$e_ziduan,$s_ziduan){
     array_multisort(array_column(array_column($data, $e_ziduan), $s_ziduan), SORT_ASC, $data);
     return $data;
 }
+/**
+ * 发送验证码
+ * //195514
+ */
+function send_sms($phone){
+    $code = rand(100000, 999999);
+    if (sendTemplateSMS($phone, array($code), "195514")){
+        $deadline = date("Y-m-d H:i:s", time() + 5 * 60);
+        if (ZcTempPhone::where('phone', $phone)->first()) {
+            ZcTempPhone::where('phone', $phone)->update(['code' => $code, 'deadline' => $deadline]);
+            return ['status' => 200];
+        } else {
+            $form_data = [
+                'phone' => $phone,
+                'code' => $code,
+                'deadline' => $deadline
+            ];
+            ZcTempPhone::create($form_data);
+            return wei_jiami(200,['errorinfo' => '验证码发送成功']);
+        }
+    }else{
+        return wei_jiami(500,['errorinfo' => '验证码发送失败']);
+    }
+}
+/**
+ * 验证验证码
+ */
+function check_code($phone,$phone_code){
+    $temp_phone = ZcTempPhone::where('phone', $phone)->first();
+    //验证码不正确或验证码过期五分钟
+    if ($temp_phone->code == $phone_code || time() < strtotime($temp_phone->deadline)) {
+        return wei_jiami(200,['errorinfo' => '验证成功']);
+    }else{
+        return wei_jiami(500,['errorinfo' => '验证失败']);
+    }
+}
 
+/**
+ * 记录日志(用于请求时没有id的)
+ */
+function record_log(Request $request,$user_id,$identity,$user_name){
+    $path = $request->path();
+        if($path == 'admin/manager/login'){
+            $path_name = '登录成功';
+        }elseif ($path == 'admin/manager/logout'){
+            $path_name = '退出成功';
+        }else{
+            $path_name = Permission::select('ps_name')->where('ps_route','like',"%$path%")->limit(1)->get();
+            if(!empty($path_name)){
 
+                $path_name = $path_name[0]->pa_name;
+            }else{
+                $path_name = '操作成功';
+            }
+        }
+        $log = new OperationLog(); # 提前创建表、model
+        $log->uid = $user_id;
+        $log->identity = $identity;
+        $log->name = $user_name;
+        $log->path_name = $path_name;
+        $log->path = $path;
+        $log->ip = $request->ip();
+//            $log->input = json_encode($input, JSON_UNESCAPED_UNICODE);
+        $log->save();
+}

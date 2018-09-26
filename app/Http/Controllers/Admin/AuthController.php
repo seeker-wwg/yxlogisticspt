@@ -12,6 +12,7 @@ class AuthController extends Controller
         return \Socialite::with('weixinweb')->redirect();
     }
 
+
     //微信的回调地址
     public function callback(Request $request)
     {

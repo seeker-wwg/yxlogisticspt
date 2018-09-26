@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 header("Access-Control-Allow-Origin:*"); //*号表示所有域名都可以访问
 header("Access-Control-Allow-Method:POST,GET");
-use App\Http\Models\Article;
+use App\Http\Models\Protocol;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class ArticleController extends Controller
+class ProtocolController extends Controller
 {
 
     /**
@@ -18,7 +18,7 @@ class ArticleController extends Controller
     {
 
         if ($request->isMethod("post")) {
-
+            return shousuo($request);
         }
     }
 

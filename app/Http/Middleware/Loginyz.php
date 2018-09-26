@@ -33,7 +33,9 @@ class Loginyz
             $user_id = $request->input('phone');
             $mg_id = Manager::select('operation')->where('phone', $user_id)->limit(1)->get()->toArray();
         }
-
+        if(empty($mg_id)){
+            exit (json_encode(['status'=>'500','data'=>['errorinfo'=>'账号不存在']]));
+        }
         $operation =  $mg_id[0]['operation'];
         if($operation == '冻结'){
             exit (json_encode(['status'=>'505','operation'=>$operation]));

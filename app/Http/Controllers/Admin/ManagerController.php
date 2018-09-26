@@ -35,7 +35,8 @@ class ManagerController extends Controller
 
                             Manager::where('mg_id',$mg_id[0]['mg_id'])->update(['token_time'=>$token_time]);
 
-
+                            //增加到日志
+                            record_log($request,$mg_id[0]['mg_id'],'管理员',$mg_id[0]['mg_name']);
 
                             return ['status' => 200,
                                 'token' => $token,

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\models\TempCount;
 use App\Http\models\TempPhone;
+use App\Http\models\ZcTempPhone;
 use App\Http\models\TempUCount;
 use Illuminate\Support\Facades\Session;
 
@@ -33,7 +34,7 @@ class UserController extends Controller
 
                       
                         $token =  encrypt_pass($mg_id[0]['token'],$max_pwd['password']);
-                        $token_time = date('Y-m-d H:i:s', time()+3600*2);
+                        $token_time = date('Y-m-d H:i:s', time()+7200);
 
                         User::where('user_id',$mg_id[0]['user_id'])->update(['token_time'=>$token_time]);
 
@@ -106,7 +107,7 @@ class UserController extends Controller
             $phone = $request->input('phone');
             $code = rand(100000, 999999);
             if ($mg_id = User::select('user_id')->where('phone', $phone)->limit(1)->get()->toArray()) {
-                if (sendTemplateSMS($phone, array($code), "1")){
+                if (sendTemplateSMS($phone, array($code), "195514")){
                     $deadline = date("Y-m-d H:i:s", time() + 5 * 60);
                     if (TempPhone::where('phone', $phone)->first()) {
                         TempPhone::where('phone', $phone)->update(['code' => $code, 'deadline' => $deadline]);
@@ -128,6 +129,14 @@ class UserController extends Controller
             } else {
                 return wei_jiami(500,['errorinfo' => '手机号尚未注册']);
             }
+        }
+    }
+
+    public function zc_sendSMS(Request $request){
+
+        if ($request->isMethod('post')) {
+            $phone = $request->input('phone');
+            return send_sms($phone);
         }
     }
 
@@ -203,6 +212,93 @@ class UserController extends Controller
     }
 
     /**
+     * 更改密码
+     * @param Request $request
+     */
+    public function update_pw(Request $request)
+    {
+        if ($request->isMethod("post")) {
+            $info = $request->all();
+            $phone = $info['phone'];
+            $password = $info['password'];
+            $phone_code = $info['phone_code'];
+            if(empty($phone_code)){
+                return  wei_jiami(500,['errorinfo'=>'请先获取验证码']);
+            }
+            if(!phone_yz($phone,'user_id')){
+                return  wei_jiami(500,['errorinfo'=>'该手机号未被注册']);
+            }
+            $temp_phone = ZcTempPhone::where('phone', $phone)->first();
+            //验证码不正确或验证码过期五分钟
+            if ($temp_phone->code != $phone_code || time() > strtotime($temp_phone->deadline)) {
+                return wei_jiami(500,['errorinfo' => '验证码错误或验证码已过期']);
+            }
+
+            $formData = ['password'=>bcrypt($password)];
+
+            $z = User::where('phone',$phone)->update($formData);
+            if ($z) {
+                $shuju = ['errorinfo'=>'密码更改成功'];
+                return wei_jiami(200,$shuju);
+            } else {
+                $shuju = ['errorinfo'=>'密码更改失败'];
+                return wei_jiami(500,$shuju);
+            }
+        }
+    }
+
+    /**
+     * 注册
+     * @param Request $request
+     */
+    public function register(Request $request)
+    {
+        if ($request->isMethod("post")) {
+            $info = $request->all();
+            $phone = $info['phone'];
+            $password1 = $info['password1'];
+            $password2 = $info['password2'];
+            $phone_code = $info['phone_code'];
+            if(empty($phone_code)){
+                return  wei_jiami(500,['errorinfo'=>'请先获取验证码']);
+            }
+            if(phone_yz($phone,'user_id')){
+                return  wei_jiami(500,['errorinfo'=>'该手机号已被注册']);
+            }
+
+            if($password1 != $password2){
+                return  wei_jiami(500,['errorinfo'=>'输入的密码不一致']);
+            }
+            $temp_phone = ZcTempPhone::where('phone', $phone)->first();
+            //验证码不正确或验证码过期五分钟
+            if ($temp_phone->code != $phone_code || time() > strtotime($temp_phone->deadline)) {
+                return wei_jiami(500,['errorinfo' => '验证码错误或验证码已过期']);
+            }
+            $formData= ['phone'=>$phone];
+            $formData['password'] = bcrypt($password1);
+
+            $dd = substr(strval(rand(10000,19999)),1,4);
+            $token1 = md5($dd);
+            $formData['token'] = $token1;
+            $z = User::create($formData);
+            if ($z) {
+                $token =  encrypt_pass($token1,$password1);
+                $token_time = date('Y-m-d H:i:s', time()+3600*2);
+
+                User::where('user_id',$z->user_id)->update(['token_time'=>$token_time,'user_name'=>'游客'.$z->user_id]);
+                $shuju = [
+                    'mi_token'=>$token,
+                    'user_id' => $z->user_id,
+                    'user_name' => '游客'.$z->user_id,
+                ];
+                return wei_jiami(200,$shuju);
+            } else {
+                $shuju = ['errorinfo'=>'注册失败'];
+                return wei_jiami(500,$shuju);
+            }
+        }
+    }
+    /**
      * 用户列表
      * @param Request $request
      */
@@ -212,8 +308,6 @@ class UserController extends Controller
             return jiami_shousuo($request);
         }
     }
-
-
     /**
      * 添加培养信息
      * @param Request $request

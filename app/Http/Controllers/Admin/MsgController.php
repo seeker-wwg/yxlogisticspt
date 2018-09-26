@@ -13,7 +13,7 @@ class MsgController extends Controller
      * 用户列表
      * @param Request $request
      */
-    public function userid(Request $request)
+    public function userid_index(Request $request)
     {
         if ($request->isMethod("post")) {
            return jiami_shousuo($request);
@@ -29,50 +29,40 @@ class MsgController extends Controller
     public function number(Request $request)
     {
         if ($request->isMethod('post')){
-
-            $user_id = $request->input('user_id');
-            $info = UserMsg::where('user_id',$user_id)->get(['status','user_id']);
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            $user_id = $info['user_id'];
+            $info = UserMsg::where('who', 'user')->where('who_id',$user_id)->get(['id']);
             $cnt  = count($info);
-            $info = encrypt_pass(serialize([
-                'status' => 200,
-                'recordsTotal' => $cnt,
-                'data' => $info,
-            ]),cut_token(session('_token')));
-            return $info;
+            $shuju =['count'=>$cnt];
+            return re_jiami(500,$shuju,$token);
         }
     }
     /**
      * 将某一用户的推送消息置为“已读”状态
      * @param Request $request
      * @return array
-     *
      */
     public function status(Request $request)
     {
         if ($request->isMethod('post')) {
-            $user_id = $request->input('user_id');
-            $msg_ids = $request->input('msg_ids');
-            $z = UserMsg::where('user_id', $user_id)->whereIn('msg_id', $msg_ids)->update(['status' => '已读']);
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            $user_id = $info['user_id'];
+            $z = UserMsg::where('who', 'user')->where('who_id', $user_id)->update(['status' => '已读']);
             if ($z) {
-                return encrypt_pass(serialize(['status' => 200]), cut_token(session('_token')));
+                $shuju = ['errorinfo'=>'已更改成功'];
+                return re_jiami(200,$shuju,$token);
             } else {
-                return encrypt_pass(serialize(['status' => 500, 'errorinfo' => '更改失败']), cut_token(session('_token')));
+                $shuju = ['errorinfo'=>'更改失败'];
+                return re_jiami(500,$shuju,$token);
             }
         }
     }
 
 
-    /**
-     * 添加推送消息信息
-     * @param Request $request
-     * @return array|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function create(Request $request)
-    {
-        if ($request->isMethod('post')) {
-            return zengjia($request);
-        }
-    }
 
 
     /**
@@ -83,7 +73,32 @@ class MsgController extends Controller
     public function delete(Request $request)
     {
         if ($request->isMethod('post')) {
-            return shanchu($request);
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            foreach ($info['query'] as $k =>$v){
+                $key  = $k;
+                $value = $v;
+            }
+            $sjk = $info['sjk'];
+            $ziyuan = orm_sjk($sjk);
+            if( !is_object ($ziyuan)){
+                return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
+            }
+            if(is_array($value)){
+                $z = $ziyuan->whereIn($key,$value)->delete();
+            }else{
+                $z = $ziyuan->where($key,$value)->delete();
+            }
+            if ($z) {
+                //前提$value是单个
+                $zz = UserMsg::where($key,$value)->delete();
+                $shuju = ['errorinfo'=>'删除成功'];
+                return re_jiami(200,$shuju,$token);
+            } else {
+                $shuju = ['errorinfo'=>'删除失败'];
+                return re_jiami(500,$shuju,$token);
+            }
         }
     }
     /**
@@ -99,25 +114,35 @@ class MsgController extends Controller
     }
 
     /**
-     *消息推送
+     *消息推送(只推送给用户)
      * @param Request $request
      * @return array
      */
     public function pushmsg(Request $request)
     {
         if ($request->isMethod('post')) {
-            $user_id = $request->input('user_id');
-            $msg_ids = $request->input('msg_ids');
-            $shuju  = Msg::get();
-            foreach ($shuju as $k =>$v){
-                $msg_id =  $v->msg_id;
-                $user_ids = UserMsg::select('user_id')->where('msg_id',$msg_id)->get()->toArray();
-                $shuju[$k]['user_ids'] = $user_ids;
-            }
-            if ($shuju) {
-                return encrypt_pass(serialize(['status' => 200 ,'data'=>$shuju]), cut_token(session('_token')));
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            $formData = $info['formData'];
+            $user_ids = $info['user_ids'];
+            $z = Msg::Create($formData);
+            if ($z) {
+                $msg_id = $z->msg_id;
+                foreach ($user_ids as $k =>$v){
+                    $msg_user = [
+                        'who_id' =>$v,
+                        'who'=>'user',
+                        'msg_id'=>$msg_id,
+                        'status'=>'未读',
+                    ];
+                    UserMsg::create($msg_user);
+                }
+                $shuju = ['errorinfo'=>'推送消息成功'];
+                return re_jiami(200,$shuju,$token);
             } else {
-                return encrypt_pass(serialize(['status' => 500, 'errorinfo' => '暂无数据']), cut_token(session('_token')));
+                $shuju = ['errorinfo'=>'推送消息失败'];
+                return re_jiami(500,$shuju,$token);
             }
         }
     }

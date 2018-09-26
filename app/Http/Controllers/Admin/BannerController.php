@@ -69,7 +69,21 @@ class BannerController extends Controller
     public function update(Request $request)
     {
         if ($request->isMethod('post')) {
-           return xiugai($request);
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            $formData = $info['formData'];
+            Banner::truncate();
+            foreach ($formData as $k =>$v){
+                $z  =  Banner::create($v);
+            }
+            if ($z) {
+                $shuju = ['errorinfo'=>'修改成功'];
+                return re_jiami(200,$shuju,$token);
+            } else {
+                $shuju = ['errorinfo'=>'修改失败'];
+                return re_jiami(500,$shuju,$token);
+            }
         }
     }
 

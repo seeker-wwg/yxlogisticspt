@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Help extends Model
 {
-    protected $table = "hlep"; //表名
-    protected $primaryKey = "hlep_id"; //主键名字
+    protected $table = "help"; //表名
+    protected $primaryKey = "help_id"; //主键名字
     protected $fillable = [
         'title','content','mg_id',
         'created_at', 'updated_at', 'deleted_at'
