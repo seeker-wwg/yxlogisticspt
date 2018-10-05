@@ -192,7 +192,7 @@ class OrderController extends Controller
             $formData = $info['formData'];
             $sjk = $info['sjk'];
             $car_data = $info['car_data'];
-            $freight_id = $info['freight_id'];
+//            $freight_id = $info['freight_id'];
             //定金
             $order_sn = uniqid('');
            // 尾款

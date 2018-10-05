@@ -11,6 +11,7 @@ class OrderVeh extends Model
     protected $primaryKey = "order_veh_id"; //主键名字
     protected $fillable = [
         'order_id','type_id','car_id','is_load','type_name','veh_price','plate_number',
+        'veh_img','veh_video',
         'created_at', 'updated_at', 'deleted_at'
     ];//数据添加、修改时允许维护的字段
     public function order()

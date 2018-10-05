@@ -9,7 +9,13 @@ class Uadd extends Model
 {
     protected $table = "uadd"; //表名
     protected $primaryKey = "uadd_id"; //主键名字
-    protected $fillable = ['user_id','user_add','created_at',
+    protected $fillable = ['user_id','user_add',
+        'd_add',
+        'name',
+        'phone',
+        'longtitude',
+        'latitude',
+        'created_at',
         'updated_at','deleted_at'];//数据添加、修改时允许维护的字段
 
     public function user()

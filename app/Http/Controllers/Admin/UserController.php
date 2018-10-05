@@ -38,6 +38,9 @@ class UserController extends Controller
 
                         User::where('user_id',$mg_id[0]['user_id'])->update(['token_time'=>$token_time]);
 
+
+                        //登录成功进行记录(统计每天每天用户)
+
                         return ['status' => 200,
                             'token' => $mg_id[0]['token'],
                             'mi_token'=>$token,

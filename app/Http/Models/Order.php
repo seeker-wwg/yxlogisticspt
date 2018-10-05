@@ -14,13 +14,13 @@ class Order extends Model
         'order_sn','d_trade_sn','w_trade_sn', 'sender_name', 'sender_type','sender_start_point',
         'sender_pointer_longtitude','sender_pointer_latitude','sender_pointer_add',
         'sender_add',
-
+        'sender_door_cost',
         'sender_longitude','sender_latitude',
         'sender_detail_add',
         'sender_phone','receive_name', 'receive_type','receive_start_point',
         'receive_pointer_longtitude','receive_pointer_latitude','sender_pointer_add',
         'receive_add',
-
+        'receive_door_cost',
         'receive_longitude','receive_latitude',
         'receive_detail_add','receive_phone',
         'user_id', 'dingjin_payment_method','weikuang_payment_method','reserve_price', 'stay_price','total_price',

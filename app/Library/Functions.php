@@ -27,6 +27,7 @@ use App\Http\Models\Role;
 use App\Http\Models\CarWai;
 use App\Http\Models\Region;
 use App\Http\Models\Permission;
+use App\Http\Models\UserLgcount;
 use App\Http\Models\OperationLog;
 
 function user_login(){
@@ -1294,4 +1295,14 @@ function record_log(Request $request,$user_id,$identity,$user_name){
         $log->ip = $request->ip();
 //            $log->input = json_encode($input, JSON_UNESCAPED_UNICODE);
         $log->save();
+}
+
+//统计每天每天用户
+function login_count($phone){
+    $nowd = date('Y-m-d H:i:s', time()+24*3600);
+    $nowx = date('Y-m-d H:i:s', time()-24*3600);
+    $created_at = [$nowx,$nowd];
+    if($uc = UserLgcount::where('phone',$phone)->whereBetween('created_at',$created_at)->get(['id'])){
+
+    }
 }

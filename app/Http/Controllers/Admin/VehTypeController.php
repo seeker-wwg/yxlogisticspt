@@ -6,8 +6,6 @@ header("Access-Control-Allow-Method:POST,GET");
 use App\Http\Models\VehType;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class VehTypeController extends Controller
 {
@@ -19,8 +17,83 @@ class VehTypeController extends Controller
         }
     }
 
+    public function create(Request $request)
+    {
+        if ($request->isMethod("post")) {
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            $sjk = $info['sjk'];
+            $ziyuan = orm_sjk($sjk);
+            $formData = $info['formData'];
+            $type_size = [
+                1=>['微型车','小型车'],
+                2=>['紧凑型车','中型车'],
+                3=>['中大型车','豪华车']
+            ];
 
+            if(array_key_exists('type_size', $formData)){
+                foreach ($type_size as $k => $v){
+                    if(in_array($formData['type_size'],$v) ){
+                        $formData['cewei_num'] = $k;
+                    }
+                }
+            }
+            if( !is_object ($ziyuan)){
+                return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
+            }
+            $z = $ziyuan->create($formData);
+            if ($z) {
+                $shuju = ['errorinfo'=>'增加成功','type_id'=>$z->type_id];
+                return re_jiami(200,$shuju,$token);
+            } else {
+                $shuju = ['errorinfo'=>'增加失败'];
+                return re_jiami(500,$shuju,$token);
+            }
+        }
+    }
 
+    public function duo_create(Request $request)
+    {
+        if ($request->isMethod("post")) {
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            $sjk = $info['sjk'];
+            $ziyuan = orm_sjk($sjk);
+            $formData = $info['formData'];
+            //id
+            $id = [];
+            $type_size = [
+                1=>['微型车','小型车'],
+                2=>['紧凑型车','中型车'],
+                3=>['中大型车','豪华车']
+            ];
+            if( !is_object ($ziyuan)){
+                return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
+            }
+            foreach ($formData as $k => $v){
+
+                if(array_key_exists('type_size', $v)){
+                    foreach ($type_size as $kk => $vv){
+                        if(in_array($v['type_size'],$vv) ){
+                            $v['cewei_num'] = $kk;
+                        }
+                    }
+                }
+                $z = $ziyuan->create($v);
+                $id[$k] = $z->type_id;
+            }
+
+            if ($z) {
+                $shuju = ['errorinfo'=>'增加成功','type_id'=>$id];
+                return re_jiami(200,$shuju,$token);
+            } else {
+                $shuju = ['errorinfo'=>'增加失败'];
+                return re_jiami(500,$shuju,$token);
+            }
+        }
+    }
     /**
      * 修改培养信息
      * @param Request $request
@@ -30,7 +103,42 @@ class VehTypeController extends Controller
     public function update(Request $request)
     {
         if ($request->isMethod('post')) {
-           return xiugai($request);
+            $datainfo =re_jiemi($request);
+            $info = $datainfo[0];
+            $token = $datainfo[1];
+            $formData = $info['formData'];
+            $type_size = [
+                1=>['微型车','小型车'],
+                2=>['紧凑型车','中型车'],
+                3=>['中大型车','豪华车']
+            ];
+
+            if(array_key_exists('type_size', $formData)){
+                foreach ($type_size as $k => $v){
+                    if(in_array($formData['type_size'],$v) ){
+                        $formData['cewei_num'] = $k;
+                    }
+                }
+            }
+            $query = $info['query'];
+            foreach ($query as $k =>$v){
+                $key  = $k;
+                $value = $v;
+            }
+
+            $sjk = $info['sjk'];
+            $ziyuan = orm_sjk($sjk);
+            if( !is_object ($ziyuan)){
+                return  wei_jiami(500,['errorinfo'=>'未找到查询数据库的字段']);
+            }
+            $z = $ziyuan->where($key,$value)->update($formData);;
+            if ($z) {
+                $shuju = ['errorinfo'=>'修改成功'];
+                return re_jiami(200,$shuju,$token);
+            } else {
+                $shuju = ['errorinfo'=>'修改失败'];
+                return re_jiami(500,$shuju,$token);
+            }
         }
     }
 

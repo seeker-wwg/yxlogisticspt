@@ -30,44 +30,66 @@ class FreightController extends Controller
     {
         if ($request->isMethod("post")) {
             //设置两个标志
-
-            $give_info = Region::where('give_spot', '1')->get(['region_id','region_name','give_spot','take_spot']);
-            $take_info = Region::where('take_spot', '1')->get(['region_id','region_name','give_spot','take_spot']);
+            $datainfo = re_jiemi($request);
+            $token = $datainfo[1];
+            $give_info = Region::where('give_spot', '1')->get(['region_id','region_name','province','city','area','give_spot','take_spot','longitude','latitude']);
+            $take_info = Region::where('take_spot', '1')->get(['region_id','region_name','province','city','area','give_spot','take_spot','longitude','latitude']);
             //刷新组成新数组
             $new_sz = [];
+            $i = 0;//记录数量
             //车型
             $type_size = ['微型车','小型车','紧凑型车','中型车','中大型车','豪华车'];
             $reight_info = Freight::get()->toArray();//带刷新的
                 foreach ($give_info as $k => $v){
-                    foreach ($take_info as $kk => $vv)
-                        if($v->give_spot == '1' && $vv->take_spot == '1' && $v->region_name != $vv->region_name ){
+                    $start_name =$v->province.'/'.$v->city.'/'.$v->area.'/'.$v->region_name;
+                    foreach ($take_info as $kk => $vv){
+                        $end_name =$vv->province.'/'.$vv->city.'/'.$vv->area.'/'.$vv->region_name;
+                        if( $v->region_name != $vv->region_name ){
                             foreach ($type_size as $kkk =>$vvv){
-                                $new_sz[$k]['start_id'] = $v->region_id;
-                                $new_sz[$k]['end_id'] = $vv->end_id;
-                                $new_sz[$k]['type_size'] = $vvv->region_id;
+                                $new_sz[$i]['start_id'] = $v->region_id;
+                                $new_sz[$i]['end_id'] = $vv->region_id;
+
+                                $new_sz[$i]['start_longitude'] = $v->longitude;
+                                $new_sz[$i]['start_latitude'] = $v->latitude;
+
+                                $new_sz[$i]['end_longitude'] = $vv->longitude;
+                                $new_sz[$i]['end_latitude'] = $vv->latitude;
+
+                                $new_sz[$i]['start_name'] = $start_name;
+                                $new_sz[$i]['end_name'] = $end_name;
+                                $new_sz[$i]['type_size'] = $vvv;
+                                $i = $i +1;
                             }
                         }
+                    }
                 }
 
                 //去除或增加数据库已存在
+
             if(count($new_sz) > count($reight_info)){
                 foreach ($new_sz as $k => $v){
-                    foreach ($reight_info as $kk =>$vv){
+                    if(!empty($reight_info)){
+
+                        foreach ($reight_info as $kk =>$vv){
+
                             if(($v->start_id == $vv->start_id) &&($v->end_id == $vv->end_id) && ($v->type_size == $vv->type_size)){
-                                    unset($new_sz[$k]);
+                                unset($new_sz[$k]);
                             }
+                        }
                     }
                 }
                 foreach ($new_sz as $k => $v){
                     Freight::create($v);
                 }
                 $shuju = ['errorinfo'=>'刷新成功'];
-                return wei_jiami(200,$shuju);
+                return re_jiami(200,$shuju,$token);
             }else{
                 foreach ($new_sz as $k => $v){
-                    foreach ($reight_info as $kk =>$vv){
-                        if(($v->start_id == $vv->start_id) &&($v->end_id == $vv->end_id) && ($v->type_size == $vv->type_size)){
-                            unset($reight_info[$kk]);
+                    if(!empty($reight_info)){
+                        foreach ($reight_info as $kk =>$vv){
+                            if(($v->start_id == $vv->start_id) &&($v->end_id == $vv->end_id) && ($v->type_size == $vv->type_size)){
+                                unset($reight_info[$kk]);
+                            }
                         }
                     }
                 }
@@ -75,11 +97,8 @@ class FreightController extends Controller
                     Freight::where('freight_id',$v->freight_id)->delete();
                 }
                 $shuju = ['errorinfo'=>'刷新成功'];
-                return wei_jiami(200,$shuju);
+                return re_jiami(200,$shuju,$token);
             }
-
-
-
         }
     }
 

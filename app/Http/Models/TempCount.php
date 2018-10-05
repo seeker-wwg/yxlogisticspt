@@ -13,6 +13,6 @@ class TempCount extends Model
         'phone', 'count', 'deadline',
         'created_at', 'updated_at', 'deleted_at'
     ];//数据添加、修改时允许维护的字段
-    use SoftDeletes;
-    protected $dates = ['deleted_at'];
+//    use SoftDeletes;
+//    protected $dates = ['deleted_at'];
 }

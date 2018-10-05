@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use zgldh\QiniuStorage\QiniuStorage;
 use App\Http\Models\Freight;
 use App\Http\Models\CarWai;
+use App\Http\Models\VehType;
 use Illuminate\Support\Facades\Session;
 use App\Tools\WcNotify;
 /*
@@ -115,13 +116,12 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 
     //获取接口列表
 
-    Route::post( 'permission/index','PermissionController@index');
+
     Route::get( 'pay/jiesuan','PayController@jiesuan');
     Route::get( 'pay/return_url','PayController@return_url');
     Route::post( 'pay/notify_url','PayController@notify_url');
-
-
-
+    //未加密的
+    Route::post('upload/w_upload_img','UploadController@w_upload_img');
 
     //获取单一字段信息
 
@@ -350,9 +350,7 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 //            'order_ids'=>7,
 //        ];
 //        $zzz =  CarWai::where('wai_id',5)->update($car_wai);
-        Help::truncate();
-
-
+     dd('ddddd');
     });
 
 
@@ -399,8 +397,10 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
                 Route::post('driver/delete','DriverController@delete');
                 Route::post('driver/index','DriverController@index');
 
-
-
+                Route::post( 'permission/index','PermissionController@index');
+                Route::post('permission/create','PermissionController@create');
+                Route::post('permission/update','PermissionController@update');
+                Route::post('permission/delete','PermissionController@delete');
                 //管理员管理
                 Route::post('manager/create','ManagerController@create');
                 Route::post('manager/update','ManagerController@update');
@@ -413,8 +413,11 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
                 Route::post('uadd/delete','UaddController@delete');
                 Route::post( 'uadd/index','UaddController@index');
 
-
-
+                //车辆类型管理
+                Route::post('vehtype/create','VehTypeController@create');
+                Route::post('vehtype/update','VehTypeController@update');
+                Route::post('vehtype/delete','VehTypeController@delete');
+                Route::post('vehtype/duo_create','VehTypeController@duo_create');
 
                 //平台运输车辆管理
                 Route::post('trucks/create','TrucksController@create');
@@ -472,6 +475,7 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
                 Route::post('freight/create','FreightController@create');
                 Route::post('freight/update','FreightController@update');
                 Route::post('freight/delete','FreightController@delete');
+                Route::post('freight/refresh','FreightController@refresh');
                 //获取单一字段
                 Route::post('field/create','FieldController@create');
                 Route::post('field/update','FieldController@update');

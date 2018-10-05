@@ -89,4 +89,28 @@ public function upload_car_execel(Request $request)
     }
     return view('uploadFile');
 }
+
+
+
+
+    /**
+     * 上传文件到七牛
+     * @author 高伟
+     * @date   2016-11-09T16:58:37+0800
+     * @param  Request                  $request [description]
+     * @return [type]                            [description]
+     */
+
+
+    public function w_upload_img(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $data = $request->input('data');
+            // 初始化
+            $disk = QiniuStorage::disk('qiniu');
+            $shuju = ['upload_token'=>$disk->uploadToken()];
+            return wei_jiami(200,$shuju);
+
+        }
+    }
 }
