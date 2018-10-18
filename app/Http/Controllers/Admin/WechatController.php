@@ -48,48 +48,52 @@ trade_state_desc: "支付成功"
             $data = $request->input('data');
             $out_trade_no =$data['out_trade_no'];
             $a = Pay::driver('wechat')->gateway('scan')->find($out_trade_no);
-            if($a['result_code'] == 'SUCCESS'){
+            if($a['trade_state'] == 'SUCCESS'){
                 //商户订单号
                        $out_trade_no = $a['out_trade_no'];
                         //① 实现订单由"未付款"变为"已付款"  并且判断一下是否为定金  或尾款
                         $order_info = Order::where('order_sn',$out_trade_no)->limit(1)->get();
                         $d_trade_sn = $order_info[0];
-                        if(empty($d_trade_sn)){
-                            $rst = Order::where('order_sn',$out_trade_no)
+                $pay_stay_time = date('Y-m-d H:i:s', strtotime($a['time_end']));
+                if(!empty($d_trade_sn)){
+                    $process = '待发车';
+                    if($d_trade_sn->sender_type == '平台派人上门取车'){
+                        $process = '待接车';
+                    }
+                    xieru('haole');
+                    $rst = Order::where('order_sn',$out_trade_no)
                                 ->update([
                                     'd_trade_sn' =>  $a['transaction_id'],
-                                    'pay_stay_time' => date('Y-m-d H:i:s', strtotime($a['time_end'])),
-                                    'process' => '待接车',
+                                    'pay_stay_time' => $pay_stay_time,
+                                    'process' => $process,
                                     'dingjin_payment_method' => '微信支付',
                                 ]);
                             if ($rst) {
                                 $data_wai = ['order_id'=> $d_trade_sn->order_id,'status_updata'=>'待接车','status_updata_time'=>date('Y-m-d H:i:s', time())];
                                 OrderWai::create($data_wai);
-                                $shuju = ['errorinfo'=>'定金付款成功，数据库数据更新成功'];
+                                $shuju = ['errorinfo'=>'定金付款成功，数据库数据更新成功','pay_stay_time'=>$pay_stay_time];
                                 return wei_jiami(200,$shuju);
                             } else {
                                 $shuju = ['errorinfo'=>'定金付款成功，数据库数据更新失败'];
                                 return wei_jiami(500,$shuju);
                             }
                         }else {
+                            xieru('buhaohaole');
                             $w_rst = Order::where('w_order_sn', $out_trade_no)
                                 ->update([
                                     'w_trade_sn' => $a['transaction_id'],
-                                    'pay_time' => date('Y-m-d H:i:s', strtotime($a['time_end'])),
-                                    'process' => '已完成',
+                                    'pay_time' =>$pay_stay_time,
                                     'weikuang_payment_method' => '微信支付',
                                 ]);
                             if ($w_rst) {
-                                $data_wai = ['order_id'=> $d_trade_sn->order_id,'status_updata'=>'已完成','status_updata_time'=>date('Y-m-d H:i:s', time())];
-                                OrderWai::create($data_wai);
-                                $shuju = ['errorinfo'=>'尾款付款成功，数据库数据更新成功'];
+                                $shuju = ['errorinfo'=>'尾款付款成功，数据库数据更新成功','pay_time'=>$pay_stay_time];
                                     return wei_jiami(200,$shuju);
                             } else {
                                 $shuju = ['errorinfo'=>'尾款付款成功，数据库数据更新失败'];                                     return wei_jiami(500,$shuju);
                                 }
                         }
             }else{
-                $shuju = ['errorinfo'=>'未查询到交易号'];                                                      return wei_jiami(500,$shuju);
+                $shuju = ['errorinfo'=>'支付失败'];                                                      return wei_jiami(500,$shuju);
             }
         }
     }
@@ -105,7 +109,7 @@ trade_state_desc: "支付成功"
             $info = $datainfo[0];
             $token = $datainfo[1];
             //需要判断订单的id是不是已通过审核
-            $tg = Order::select('order_sn','reserve_price')->where('order_id',$info['id'])->where('process','待付款')->get();
+            $tg = Order::select('order_sn','reserve_price')->where('order_id',$info['order_id'])->where('process','待付款')->get();
             if(empty($tg[0])){
                 $err =  ['err'=>'订单尚未通过审核'];
             return re_jiami(500,$err,$token);
@@ -117,13 +121,13 @@ trade_state_desc: "支付成功"
                 'total_fee' => $tg[0]['reserve_price']*100, // **单位：分**
                 'body' => '运输车辆预付金',
                 'spbill_create_ip' => '8.8.8.8',
-                'product_id' => 'yxwl' . time(),             // 订单商品 ID
+                'product_id' => 'yxwl',             // 订单商品 ID
             ];
 
             $wechat_url = Pay::driver('wechat')->gateway('scan')->pay($config_biz);
 
             $shuju = ['wechat_url'=>$wechat_url,'out_trade_no'=>$out_trade_no];
-            return wei_jiami(200,$shuju);
+            return re_jiami(200,$shuju,$token);
         }
     }
 
@@ -158,17 +162,18 @@ trade_state_desc: "支付成功"
 //        ];
 
         $config_biz = [
-            'out_trade_no' =>'8bd457edaad0d',
+            'out_trade_no' =>'9bd457edaad0d',
             'total_fee' => 1, // **单位：分**
             'body' => '运输车辆预付金',
             'spbill_create_ip' => '8.8.8.8',
-            'product_id' => 'yxwl' . time(),             // 订单商品 ID
+            'product_id' => 'yxwl',             // 订单商品 ID
         ];
 
 //        $pay = new Pay($this->config);
 
 //        return Pay::driver('wechat')->gateway('scan')->pay($config_biz);
         $wechat_url = Pay::driver('wechat')->gateway('scan')->pay($config_biz);
+//        $wechat_url = Pay::driver('wechat')->gateway('wap')->pay($config_biz);
         $out_trade_no ='8bb457edaad0d';
         $shuju = ['wechat_url'=>$wechat_url,'out_trade_no'=>$out_trade_no];
         return wei_jiami(200,$shuju);
@@ -184,7 +189,9 @@ trade_state_desc: "支付成功"
         if ($verify) {
 //            return $verify;
 //            $verify['out_trade_no'];
+            xieru('fahui');
             xieru($verify);
+            xieru('yibu');
 
 
             //商户订单号

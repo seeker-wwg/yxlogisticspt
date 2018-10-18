@@ -265,7 +265,7 @@ class OrderController extends Controller
             $order_id = $info['order_id'];
             $z = Order::where('order_id',$order_id)->update($formData);
             if ($z) {
-               $uo_msg = Order::where('order_id',$order_id)-get(['order_sn','user_id','process','not_pass']);
+               $uo_msg = Order::where('order_id',$order_id)->get(['order_sn','user_id','process','not_pass']);
                 if($formData['process'] == '待付款'){
                     //创建用户推荐消息
                     $user_msg  =[

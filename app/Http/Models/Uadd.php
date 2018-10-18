@@ -22,7 +22,7 @@ class Uadd extends Model
     {
         return $this->belongsTo('\App\Http\Models\User','user_id');
     }
-    //设置软删除
-    use SoftDeletes;
-    protected $dates = ['deleted_at'];
+//    //设置软删除
+//    use SoftDeletes;
+//    protected $dates = ['deleted_at'];
 }

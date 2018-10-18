@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-
+use App\Http\Controllers\Admin\HomeController;
 class Test extends Command
 {
     /**
@@ -47,6 +47,7 @@ class Test extends Command
      */
     public function handle()
     {
-        // 功能代码写到这里
+        $home = new HomeController();
+        $home->create_user_num();
     }
 }

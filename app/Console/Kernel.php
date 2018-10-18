@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
         //          ->hourly();
         $schedule->command('test:data')
             ->timezone('Asia/Shanghai')
-            ->everyMinute();
+            ->daily();//daily
     }
 
     /**

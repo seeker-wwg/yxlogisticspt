@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use zgldh\QiniuStorage\QiniuStorage;
 use App\Http\Models\Freight;
 use App\Http\Models\CarWai;
+use App\Http\Models\Protocol;
 use App\Http\Models\VehType;
 use Illuminate\Support\Facades\Session;
 use App\Tools\WcNotify;
@@ -32,7 +33,7 @@ use App\Tools\WcNotify;
 // 上传页面视图
 Route::get('/',function ()
 {
-    return view('welcome');
+    return view('weixin');
 });
 
 //【后台路由群组】
@@ -68,7 +69,7 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
     //首页
     Route::post('home/dsyc', 'HomeController@dsyc');
     Route::get('home/order_count', 'HomeController@order_count');
-
+    Route::get('home/user_num', 'HomeController@user_num');
     //用户或管理员退出
     Route::post('user/logout','UserController@logout');
     Route::post('driver/logout','DriverController@logout');
@@ -350,7 +351,8 @@ Route::group(['prefix'=>'admin','namespace'=>'Admin'],function(){
 //            'order_ids'=>7,
 //        ];
 //        $zzz =  CarWai::where('wai_id',5)->update($car_wai);
-     dd('ddddd');
+        //  <a class="btn" href="http://t.cn/Evw9UNi">打开微信</a>
+            return view('weixin');
     });
 
 

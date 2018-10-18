@@ -6,6 +6,7 @@ header("Access-Control-Allow-Method:POST,GET");
 use App\Http\Models\Driver;
 use App\Http\Models\User;
 use App\Http\Models\Car;
+use App\Http\Models\UserDay;
 use App\Http\Models\Order;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -104,18 +105,31 @@ class HomeController extends Controller
     }
 
     /**
-     * 多个选择删除
+     * 获取近7天的用户数
      * @param Request $request
      * @return array
      */
-    public function delete(Request $request)
+    public function user_num(Request $request)
     {
-        if ($request->isMethod('post')){
-            return shanchu($request);
+        if ($request->isMethod('get')){
+            $user_num =UserDay::orderBy('id','desc')->limit(7)->get(['user_num','created_at']);
+            $shuju = ['user_num'=>$user_num];
+            return wei_jiami(200,$shuju);
         }
     }
 
-
+    /**
+     * 创建今天的用户数
+     * @param Request $request
+     * @return array
+     */
+    public function create_user_num()
+    {
+            $user_num = User::get(['user_id']);
+            $user_num =count($user_num);
+            $user_data = ['user_num'=>$user_num];
+            $z =UserDay::create($user_data);
+    }
     /**
      * 添加用户地址信息
      * @param Request $request

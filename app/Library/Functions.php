@@ -33,6 +33,16 @@ use App\Http\Models\OperationLog;
 function user_login(){
 
 }
+//数组过滤
+function test_odd($a,$c){
+    $keys =  array_keys($a);
+    foreach ($keys as $k => $v){
+        if(!in_array($v,$c)){
+            unset($a[$v]);
+        }
+    }
+    return $a;
+}
 
 function xieru($data){
     if(is_array($data)){
@@ -240,6 +250,7 @@ function qingqiu_jiami(Request $request){
         $field = isset($info['field'])?$info['field']:null;
         $connect = isset($info['connect'])?$info['connect']:[];
         $population = isset($info['population'])?$info['population']:[];
+//        xieru($population);
         $sjk = isset($info['sjk'])?$info['sjk']:null;
         //B. 排序
         $offset = isset($info['start'])?$info['start']:null;
@@ -430,14 +441,22 @@ function shousuo(Request $request){
             ->get($datainfo[0]); //数据本身是一个集合，里边每个单元都是一个小的lesson对象
     }
     //添加额外的字段
-
     foreach ($shuju as $k=>$v){
         foreach ($datainfo[1] as $kk => $vv){
             if(isset($v->$vv) && !empty($v->$vv)){
                 $userinfo=$v->$vv->toArray();
                 unset($shuju[$k][$vv]);
-                $d = test_odd($userinfo,$datainfo[2]);
-                $shuju[$k][$vv] = $d;
+                if(count($userinfo) == count($userinfo,1)){
+                    //$userinfo 是一维数组
+                    $d = test_odd($userinfo,$datainfo[2]);
+                    $shuju[$k][$vv] = $d;
+                }else{
+                    //$userinfo 二维是数组
+                    foreach ($userinfo as $kkk => $vvv){
+                        $d = test_odd($vvv,$datainfo[2]);
+                        $shuju[$k][$vv][$kkk] = $d;
+                    }
+                }
             }
         }
     }
@@ -460,7 +479,7 @@ function jiami_shousuo(Request $request){
     }
     $search = $datainfo[8];
     $jiansuo = $datainfo[9];
-    xieru($jiansuo);
+//    xieru($jiansuo);
     $created_at = $datainfo[10];
     $updated_at = $datainfo[11];
 //return [$datainfo[4],$datainfo[5]];
@@ -549,18 +568,25 @@ function jiami_shousuo(Request $request){
             ->get($datainfo[0]); //数据本身是一个集合，里边每个单元都是一个小的lesson对象
     }
     //添加额外的字段
-
     foreach ($shuju as $k=>$v){
         foreach ($datainfo[1] as $kk => $vv){
             if(isset($v->$vv) && !empty($v->$vv)){
                 $userinfo=$v->$vv->toArray();
                 unset($shuju[$k][$vv]);
-                $d = test_odd($userinfo,$datainfo[2]);
-                $shuju[$k][$vv] = $d;
+                if(count($userinfo) == count($userinfo,1)){
+                    //$userinfo 是一维数组
+                    $d = test_odd($userinfo,$datainfo[2]);
+                    $shuju[$k][$vv] = $d;
+                }else{
+                    //$userinfo 二维是数组
+                    foreach ($userinfo as $kkk => $vvv){
+                        $d = test_odd($vvv,$datainfo[2]);
+                        $shuju[$k][$vv][$kkk] = $d;
+                    }
+                }
             }
         }
     }
-
     return re_jiami(200,$shuju,$datainfo[12],$datainfo[13]);
 }
 //-----------------------------------------------------
@@ -584,7 +610,7 @@ function phone_yz($phone,$role){
         $mg_id = Manager::select('phone')->where('phone', $phone)->limit(1)->get()->toArray();
         xieru(3);
     }
-    xieru($mg_id);
+//    xieru($mg_id);
     if(!empty($mg_id)){
         return true;
     }
@@ -867,20 +893,6 @@ function shanchu(Request $request){
         return re_jiami(500,$shuju,$token);
     }
 }
-
-
-
-//数组过滤
-function test_odd($a,$c){
-    $keys =  array_keys($a);
-    foreach ($keys as $k => $v){
-        if(!in_array($v,$c)){
-            unset($a[$v]);
-        }
-    }
-    return $a;
-}
-
 
 function cut_token($token){
     return substr($token,0,32);
